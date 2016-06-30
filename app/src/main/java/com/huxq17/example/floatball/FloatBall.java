@@ -19,6 +19,8 @@ import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 
+import com.huxq17.example.floatball.interfaces.IMenu;
+
 public class FloatBall extends RelativeLayout {
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mLayoutParams;
@@ -42,6 +44,12 @@ public class FloatBall extends RelativeLayout {
     private ExpanableLayout showingmenuView;
     private boolean layoutfromTouch = false;
     private boolean isMenuShowing = false;
+
+    private IMenu menuOperator;
+
+    public void setMenu(IMenu menu) {
+        this.menuOperator = menu;
+    }
 
 
     public void setIsHiddenWhenExit(boolean isHiddenWhenExit) {
@@ -74,7 +82,7 @@ public class FloatBall extends RelativeLayout {
 
         ivFloatBall = new ImageView(context);
         ivFloatBall.setId(getId());
-        ivFloatBall.setImageResource(R.drawable.floatball2);
+        setFloatImage(R.drawable.floatball2, 1);
         ivFloatBall.setScaleType(ImageView.ScaleType.FIT_XY);
         layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 40), DensityUtil.dip2px(getContext(), 40));
         layoutParams.addRule(RIGHT_OF, leftMenu.getId());
@@ -107,6 +115,12 @@ public class FloatBall extends RelativeLayout {
 
     public int getId() {
         return IDFactory.getId();
+    }
+
+    private void setFloatImage(int imageid, float alpha) {
+        ivFloatBall.setImageResource(imageid);
+//        ivFloatBall.setImageAlpha();
+        ivFloatBall.setAlpha(alpha);
     }
 
     private void addContentView(ViewGroup parent) {
@@ -150,7 +164,6 @@ public class FloatBall extends RelativeLayout {
         tvLeftGift.setGravity(Gravity.CENTER);
         tvLeftGift.setTextColor(Color.parseColor("#333333"));
         parent.addView(tvLeftGift, layoutParams);
-
         layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 1), DensityUtil.dip2px(getContext(), 30));
         layoutParams.setMargins(0, DensityUtil.dip2px(getContext(), 8), 0, DensityUtil.dip2px(getContext(), 8));
         layoutParams.addRule(LEFT_OF, tvLeftGift.getId());
@@ -229,16 +242,14 @@ public class FloatBall extends RelativeLayout {
         int[] floatLocation = new int[2];
         ivFloatBall.getLocationOnScreen(floatLocation);
         int floatLeft = floatLocation[0];
-        mclipRunnable.floatLeft = floatLeft;
         if (show) {
             isMenuShowing = true;
-            ivFloatBall.setImageResource(R.drawable.floatball2);
+            setFloatImage(R.drawable.floatball2, 1);
             if (floatLeft + ivFloatBall.getHeight() / 2 <= mScreenWidth / 2) {
                 showingmenuView = (ExpanableLayout) rightMenu.getChildAt(0);
             } else {
                 showingmenuView = (ExpanableLayout) leftMenu.getChildAt(0);
             }
-//            showingmenuView.setVisibility(VISIBLE);
             mClipScroller.startScroll(0, 0, width, 0, 300);
             post(mclipRunnable);
         } else {
@@ -262,6 +273,7 @@ public class FloatBall extends RelativeLayout {
         setVisibility(VISIBLE);
         if (!isAdded) {
             mWindowManager.addView(this, mLayoutParams);
+            fadeOutFloatBall();
             isAdded = true;
         }
     }
@@ -430,8 +442,6 @@ public class FloatBall extends RelativeLayout {
     private ClipRunnable mclipRunnable = new ClipRunnable();
 
     private class ClipRunnable implements Runnable {
-        private int floatLeft;
-
         @Override
         public void run() {
             if (mClipScroller.computeScrollOffset() && showingmenuView != null) {
@@ -448,6 +458,7 @@ public class FloatBall extends RelativeLayout {
     }
 
     private void fadeOutFloatBall() {
+        removeCallbacks(mFadeOutRunnable);
         postDelayed(mFadeOutRunnable, 5000);
     }
 
@@ -458,7 +469,7 @@ public class FloatBall extends RelativeLayout {
         @Override
         public void run() {
             if (!isMenuShowing) {
-                ivFloatBall.setImageResource(R.drawable.floatball2);
+                setFloatImage(R.drawable.floatball2, 0.3f);
             }
         }
     }
@@ -486,9 +497,12 @@ public class FloatBall extends RelativeLayout {
     };
 
     public void dismiss() {
-        if (mWindowManager != null) {
+        if (isAdded && mWindowManager != null) {
             mWindowManager.removeView(this);
         }
+        removeCallbacks(mclipRunnable);
+        removeCallbacks(mFadeOutRunnable);
+        removeCallbacks(mScrollRunnable);
         isAdded = false;
     }
 

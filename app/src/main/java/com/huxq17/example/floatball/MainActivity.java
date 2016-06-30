@@ -28,30 +28,27 @@ public class MainActivity extends Activity {
         Button btn = (Button) findViewById(R.id.btn);
         btn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                showDesk();
+                show();
             }
         });
-//		 mFloatBall.setIsHiddenWhenExit(true);
         mFloatBall.setLayoutGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-//        requestAlertWindowPermission();
     }
 
     private void createDesktopLayout() {
         mFloatBall = new FloatBall(this);
     }
 
-    private void showDesk() {
+    private void show() {
         mFloatBall.show();
-//        finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-		closeDesk();
+        dismiss();
     }
 
-    private void closeDesk() {
+    private void dismiss() {
         mFloatBall.dismiss();
     }
 
