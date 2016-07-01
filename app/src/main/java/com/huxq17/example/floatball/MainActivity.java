@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
     public void changeOrientation(View v) {
         if (Utils.isScreenOriatationPortrait(this)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
@@ -31,11 +31,12 @@ public class MainActivity extends Activity {
                 show();
             }
         });
-        mFloatBall.setLayoutGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        mFloatBall.setLayoutGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
     }
 
     private void createDesktopLayout() {
-        mFloatBall = new FloatBall(this);
+        FloatBallMenu menu = new FloatBallMenu();
+        mFloatBall = new FloatBall(this, menu);
     }
 
     private void show() {
