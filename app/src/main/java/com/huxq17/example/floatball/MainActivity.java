@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
                 show();
             }
         });
-        mFloatBall.setLayoutGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        mFloatBall.setLayoutGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
     }
 
     private void createDesktopLayout() {

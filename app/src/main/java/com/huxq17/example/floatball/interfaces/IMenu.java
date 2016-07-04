@@ -7,20 +7,20 @@ import android.widget.RelativeLayout;
  */
 public interface IMenu {
     /**
-     * 添加悬浮球左侧的菜单
+     * 添加悬浮球左侧菜单的内容
      *
      * @param parent
-     * @param layoutParams
+     * @param childLayoutParams
      */
-    void addLeftMenu(RelativeLayout parent, RelativeLayout.LayoutParams layoutParams);
+    void addLeftMenu(RelativeLayout parent, RelativeLayout.LayoutParams childLayoutParams);
 
     /**
-     * 添加悬浮球右侧的菜单
+     * 添加悬浮球右侧菜单的内容
      *
      * @param parent
-     * @param layoutParams
+     * @param childLayoutParams
      */
-    void addRightMenu(RelativeLayout parent, RelativeLayout.LayoutParams layoutParams);
+    void addRightMenu(RelativeLayout parent, RelativeLayout.LayoutParams childLayoutParams);
 
     /**
      * 悬浮球右侧的菜单是否可用

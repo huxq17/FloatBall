@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,9 +36,7 @@ public class FloatBall extends RelativeLayout {
     private int mLeft;
     private Rect windowRect = new Rect();
     private ImageView ivFloatBall;
-    private ExpanableLayout rightMenu;
-    private ExpanableLayout leftMenu;
-    private int leftMenuWidth, rightMenuWidth;
+    private int leftMenuWidth;
     private int mTouchSlop;
     private boolean isIntercepted = false;
     private ExpanableLayout showingmenuView;
@@ -60,17 +59,29 @@ public class FloatBall extends RelativeLayout {
         init(context, menu);
     }
 
+    private int menuWidth;
+    private int menuHeight;
+    private ExpanableLayout menu;
+    private int floatBallWidth, floatBallHeight;
+
     private void init(Context context, IMenu menu) {
+
+        floatBallWidth = DensityUtil.dip2px(getContext(), 40);
+        floatBallHeight = DensityUtil.dip2px(getContext(), 40);
+        mScroller = new Scroller(getContext());
+        mClipScroller = new Scroller(getContext(), new LinearInterpolator());
+        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
         menuOperator = menu;
         addMenu(context);
         ivFloatBall = new ImageView(context);
         ivFloatBall.setId(getId());
         setFloatImage(R.drawable.floatball2, 1);
         ivFloatBall.setScaleType(ImageView.ScaleType.FIT_XY);
-        LayoutParams layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 40), DensityUtil.dip2px(getContext(), 40));
-        layoutParams.addRule(RIGHT_OF, leftMenu.getId());
-        layoutParams.addRule(LEFT_OF, rightMenu.getId());
-        layoutParams.setMargins(-DensityUtil.dip2px(context, 20), 0, -DensityUtil.dip2px(context, 20), 0);
+        LayoutParams layoutParams = new LayoutParams(floatBallWidth, floatBallHeight);
+        layoutParams.addRule(CENTER_IN_PARENT);
+//        layoutParams.addRule(RIGHT_OF, leftMenu.getId());
+//        layoutParams.addRule(LEFT_OF, rightMenu.getId());
+//        layoutParams.setMargins(-floatBallHeight / 2, 0, -floatBallHeight / 2, 0);
         ivFloatBall.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,46 +89,63 @@ public class FloatBall extends RelativeLayout {
             }
         });
         this.addView(ivFloatBall, layoutParams);
-        leftMenuWidth = rightMenuWidth = DensityUtil.dip2px(getContext(), 135 - 20);
+        leftMenuWidth = menuWidth - floatBallHeight / 2;
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(menuWidth * 2, ivFloatBall.getMeasuredHeight());
+    }
+
+    private int menuBackground = Color.parseColor("#fafafa");
+
     private void addMenu(Context context) {
-        mScroller = new Scroller(getContext());
-        mClipScroller = new Scroller(getContext(), new LinearInterpolator());
-        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-
-        rightMenu = new ExpanableLayout(context);
-        rightMenu.setId(getId());
-        rightMenu.setOritation(ExpanableLayout.RIGHT);
-        leftMenu = new ExpanableLayout(context);
-        leftMenu.setId(getId());
-        leftMenu.setOritation(ExpanableLayout.LEFT);
-
-        leftMenu.setBackgroundColor(Color.parseColor("#fafafa"));
-        addLeftMenu(leftMenu);
-        rightMenu.setBackgroundColor(Color.parseColor("#fafafa"));
-        addRightMenu(rightMenu);
-
-        LayoutParams layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 135), DensityUtil.dip2px(getContext(), 30));
+        menuWidth = DensityUtil.dip2px(getContext(), 135);
+        menuHeight = DensityUtil.dip2px(getContext(), 30);
+        menu = new ExpanableLayout(context);
+        menu.setId(getId());
+        menu.setBackgroundColor(menuBackground);
+        addLeftMenu(menu);
+        LayoutParams layoutParams = new LayoutParams(menuWidth, menuHeight);
         layoutParams.addRule(CENTER_VERTICAL);
+        layoutParams.addRule(ALIGN_PARENT_LEFT);
         if (menuOperator != null && menuOperator.isLeftMenuEnable()) {
-            addView(leftMenu, 0, layoutParams);
+            addView(menu, layoutParams);
         }
 
-        layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 135), DensityUtil.dip2px(getContext(), 30));
-        layoutParams.addRule(RIGHT_OF, leftMenu.getId());
-        layoutParams.addRule(CENTER_VERTICAL);
-        if (menuOperator != null && menuOperator.isRightMenuEnable()) {
-            addView(rightMenu, layoutParams);
-        }
+//        rightMenu = new ExpanableLayout(context);
+//        rightMenu.setId(getId());
+//        rightMenu.setOritation(ExpanableLayout.RIGHT);
+//        leftMenu = new ExpanableLayout(context);
+//        leftMenu.setId(getId());
+//        leftMenu.setOritation(ExpanableLayout.LEFT);
+
+//        leftMenu.setBackgroundColor(Color.parseColor("#fafafa"));
+//        addLeftMenu(leftMenu);
+//        rightMenu.setBackgroundColor(Color.parseColor("#fafafa"));
+//        addRightMenu(rightMenu);
+//
+//        LayoutParams layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 135), DensityUtil.dip2px(getContext(), 30));
+//        layoutParams.addRule(CENTER_VERTICAL);
+//        if (menuOperator != null && menuOperator.isLeftMenuEnable()) {
+//            addView(leftMenu, 0, layoutParams);
+//        }
+//
+//        layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 135), DensityUtil.dip2px(getContext(), 30));
+//        layoutParams.addRule(RIGHT_OF, leftMenu.getId());
+//        layoutParams.addRule(CENTER_VERTICAL);
+//        if (menuOperator != null && menuOperator.isRightMenuEnable()) {
+//            addView(rightMenu, layoutParams);
+//        }
     }
 
     public int getId() {
         return IDFactory.getId();
     }
 
-    private void setFloatImage(int imageid, float alpha) {
-        ivFloatBall.setImageResource(imageid);
+    private void setFloatImage(int imageId, float alpha) {
+        ivFloatBall.setImageResource(imageId);
         ivFloatBall.setAlpha(alpha);
     }
 
@@ -187,6 +215,28 @@ public class FloatBall extends RelativeLayout {
         setVisibility(GONE);
     }
 
+    private static final int Left = 0;
+    private static final int Right = 1;
+
+    private void showMenuSide(int side) {
+        showingmenuView = menu;
+        if (menu == null) {
+            return;
+        }
+        LayoutParams layoutParams = (LayoutParams) menu.getLayoutParams();
+        switch (side) {
+            case Left:
+                menu.setOritation(ExpanableLayout.LEFT);
+                layoutParams.addRule(ALIGN_PARENT_LEFT);
+                break;
+            case Right:
+                menu.setOritation(ExpanableLayout.RIGHT);
+                layoutParams.addRule(ALIGN_PARENT_RIGHT);
+                break;
+        }
+        menu.setLayoutParams(layoutParams);
+    }
+
     private void showMenu(boolean show) {
         int width = DensityUtil.dip2px(getContext(), 135);
         int[] floatLocation = new int[2];
@@ -197,14 +247,16 @@ public class FloatBall extends RelativeLayout {
             if (floatLeft + ivFloatBall.getHeight() / 2 <= mScreenWidth / 2) {
                 if (menuOperator != null && menuOperator.isRightMenuEnable()) {
                     isMenuShowing = true;
-                    showingmenuView = rightMenu;
+//                    showingmenuView = rightMenu;
+                    showMenuSide(Right);
                 } else {
                     isMenuShowing = false;
                 }
             } else {
                 if (menuOperator != null && menuOperator.isLeftMenuEnable()) {
                     isMenuShowing = true;
-                    showingmenuView =  leftMenu;
+//                    showingmenuView = leftMenu;
+                    showMenuSide(Left);
                 } else {
                     isMenuShowing = false;
                 }
@@ -255,6 +307,7 @@ public class FloatBall extends RelativeLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         int action = event.getActionMasked();
+        Log.i("tag", "dispatchTouchEvent width=" + getWidth()+";height="+getHeight());
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 removeCallbacks(mFadeOutRunnable);
