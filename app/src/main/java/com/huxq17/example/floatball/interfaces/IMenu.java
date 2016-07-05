@@ -1,5 +1,6 @@
 package com.huxq17.example.floatball.interfaces;
 
+import android.content.Context;
 import android.widget.RelativeLayout;
 
 /**
@@ -7,20 +8,18 @@ import android.widget.RelativeLayout;
  */
 public interface IMenu {
     /**
-     * 添加悬浮球左侧菜单的内容
+     * 绑定context,可以在这个方法里做一些初始话的操作
      *
-     * @param parent
-     * @param childLayoutParams
+     * @param context 传入的是application context，可以用来获取宽度和长度等值
      */
-    void addLeftMenu(RelativeLayout parent, RelativeLayout.LayoutParams childLayoutParams);
+    void onAttachContext(Context context);
 
     /**
-     * 添加悬浮球右侧菜单的内容
+     * 添加悬浮球菜单的内容
      *
      * @param parent
-     * @param childLayoutParams
      */
-    void addRightMenu(RelativeLayout parent, RelativeLayout.LayoutParams childLayoutParams);
+    void addMenu(RelativeLayout parent);
 
     /**
      * 悬浮球右侧的菜单是否可用
@@ -35,4 +34,22 @@ public interface IMenu {
      * @return
      */
     boolean isLeftMenuEnable();
+
+    void showingRightMenu();
+
+    void showingLeftMenu();
+
+    /**
+     * 获取菜单的高度
+     *
+     * @return
+     */
+    int getMenuHeight();
+
+    /**
+     * 获取菜单的宽度
+     *
+     * @return
+     */
+    int getMenuWidth();
 }
