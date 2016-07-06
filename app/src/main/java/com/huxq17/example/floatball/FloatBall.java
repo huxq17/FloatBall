@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -51,12 +50,23 @@ public class FloatBall extends ViewGroup {
 
     public FloatBall(Context context) {
         super(context);
-        init(context, null);
+        init(context, null, 0, 0);
     }
 
     public FloatBall(Context context, IMenu menu) {
         super(context);
-        init(context, menu);
+        init(context, menu, 0, 0);
+    }
+
+    /**
+     * @param context         上下文
+     * @param menu            菜单
+     * @param floatBallWidth  悬浮球宽度
+     * @param floatBallHeight 悬浮球高度
+     */
+    public FloatBall(Context context, IMenu menu, int floatBallWidth, int floatBallHeight) {
+        super(context);
+        init(context, menu, floatBallWidth, floatBallWidth);
     }
 
     private int menuWidth;
@@ -64,12 +74,18 @@ public class FloatBall extends ViewGroup {
     private ExpanableLayout menu;
     private int floatBallWidth, floatBallHeight;
 
-    private void init(Context context, IMenu menu) {
+    private void init(Context context, IMenu menu, int fbWidth, int fbHeight) {
         if (menu != null) {
             menu.onAttachContext(context.getApplicationContext());
         }
         floatBallWidth = DensityUtil.dip2px(getContext(), 40);
         floatBallHeight = DensityUtil.dip2px(getContext(), 40);
+        if (fbWidth != 0) {
+            floatBallWidth = fbWidth;
+        }
+        if (fbHeight != 0) {
+            floatBallHeight = fbHeight;
+        }
         mScroller = new Scroller(getContext());
         mClipScroller = new Scroller(getContext(), new LinearInterpolator());
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
@@ -80,9 +96,6 @@ public class FloatBall extends ViewGroup {
         setFloatImage(R.drawable.floatball2, 1);
         ivFloatBall.setScaleType(ImageView.ScaleType.FIT_XY);
         LayoutParams layoutParams = new LayoutParams(floatBallWidth, floatBallHeight);
-//        layoutParams.addRule(RIGHT_OF, leftMenu.getId());
-//        layoutParams.addRule(LEFT_OF, rightMenu.getId());
-//        layoutParams.setMargins(-floatBallHeight / 2, 0, -floatBallHeight / 2, 0);
         ivFloatBall.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,53 +138,6 @@ public class FloatBall extends ViewGroup {
         }
     }
 
-    public void setOnCenterClickListener(final OnClickListener listener) {
-        if (listener == null) {
-            return;
-        }
-//        tvLeftCenter.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-//        tvRightCenter.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-    }
-
-    public void setOnGiftClickListener(final OnClickListener listener) {
-        if (listener == null) {
-            return;
-        }
-//        tvLeftGift.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-//        tvRightGift.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-    }
-
-    public void clear() {
-//        tvLeftGift.setOnClickListener(null);
-//        tvLeftCenter.setOnClickListener(null);
-//        tvRightCenter.setOnClickListener(null);
-//        tvRightGift.setOnClickListener(null);
-    }
-
     public void clickButton() {
         showMenu(false);
         setVisibility(GONE);
@@ -202,7 +168,6 @@ public class FloatBall extends ViewGroup {
     }
 
     private void showMenu(boolean show) {
-        int width = DensityUtil.dip2px(getContext(), 135);
         int[] floatLocation = new int[2];
         ivFloatBall.getLocationOnScreen(floatLocation);
         int floatLeft = floatLocation[0];
@@ -224,13 +189,13 @@ public class FloatBall extends ViewGroup {
                 }
             }
             if (isMenuShowing) {
-                mClipScroller.startScroll(0, 0, width, 0, 300);
+                mClipScroller.startScroll(0, 0, menuWidth, 0, 300);
                 post(mclipRunnable);
             }
         } else {
             if (isMenuShowing) {
                 isMenuShowing = false;
-                mClipScroller.startScroll(width, 0, -width, 0, 300);
+                mClipScroller.startScroll(menuWidth, 0, -menuWidth, 0, 300);
                 post(mclipRunnable);
             }
         }
@@ -280,10 +245,8 @@ public class FloatBall extends ViewGroup {
         int menuLeft = 0;
         if (left == 0 - leftMenuWidth) {//在屏幕的左边
             menuLeft = menu.getMeasuredWidth();
-//            menu.setPadding(0, 0, floatBallWidth / 2, 0);
         } else if (left == mScreenWidth - getMeasuredWidth() + leftMenuWidth) {//在屏幕的右边
             menuLeft = 0;
-//            menu.setPadding(floatBallWidth / 2, 0, 0, 0);
         }
         menu.layout(menuLeft, menuTop, menuLeft + menu.getMeasuredWidth(), menuTop + menu.getMeasuredHeight());
         int floatLeft = l + leftMenuWidth;
@@ -428,12 +391,6 @@ public class FloatBall extends ViewGroup {
         mWindowManager.updateViewLayout(this, mLayoutParams);
     }
 
-    private void swapHeightAndWidth() {
-        mScreenWidth = mScreenHeight + mScreenWidth;
-        mScreenHeight = mScreenWidth - mScreenHeight;
-        mScreenWidth = mScreenWidth - mScreenHeight;
-    }
-
     private void move(int deltaX, int deltaY) {
         int gravity = mLayoutParams.gravity;
         if ((Gravity.RIGHT & gravity) == Gravity.RIGHT) {
@@ -460,7 +417,6 @@ public class FloatBall extends ViewGroup {
                 showingmenuView.setOffset(currentX);
                 if (currentX == mClipScroller.getFinalX()) {
                     ivFloatBall.setClickable(true);
-//                    showingmenuView.setVisibility(currentX == 0 ? GONE : VISIBLE);
                 }
                 post(this);
             }
@@ -537,23 +493,6 @@ public class FloatBall extends ViewGroup {
     }
 
     /**
-     * 判断悬浮球是否在屏幕以内
-     *
-     * @return
-     */
-    private boolean hasBallInside() {
-        Rect bounds = new Rect();
-        ivFloatBall.getGlobalVisibleRect(bounds);
-        int[] location = new int[2];
-        ivFloatBall.getLocationOnScreen(location);
-        bounds.set(location[0], location[1], location[0] + bounds.right, location[1] + bounds.bottom);
-        if (windowRect.contains(bounds)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 将悬浮球的中心点移动到触摸点
      *
      * @param event
@@ -582,18 +521,20 @@ public class FloatBall extends ViewGroup {
         doMove(finalX, finalY);
     }
 
-    @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new MarginLayoutParams(getContext(), attrs);
-    }
-
-    @Override
-    protected LayoutParams generateDefaultLayoutParams() {
-        return new MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-    }
-
-    @Override
-    protected LayoutParams generateLayoutParams(LayoutParams p) {
-        return new MarginLayoutParams(p);
+    /**
+     * 判断悬浮球是否在屏幕以内
+     *
+     * @return
+     */
+    private boolean hasBallInside() {
+        Rect bounds = new Rect();
+        ivFloatBall.getGlobalVisibleRect(bounds);
+        int[] location = new int[2];
+        ivFloatBall.getLocationOnScreen(location);
+        bounds.set(location[0], location[1], location[0] + bounds.right, location[1] + bounds.bottom);
+        if (windowRect.contains(bounds)) {
+            return true;
+        }
+        return false;
     }
 }

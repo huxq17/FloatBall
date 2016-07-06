@@ -65,7 +65,6 @@ public class ExpanableLayout extends RelativeLayout {
         }
         this.offset = offset;
         ViewCompat.postInvalidateOnAnimation(this);
-
     }
 
     private int offset = 0;

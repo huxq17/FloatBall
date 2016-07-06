@@ -6,8 +6,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
 public class MainActivity extends Activity {
     private FloatBall mFloatBall;
@@ -24,20 +22,24 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        createDesktopLayout();
-        Button btn = (Button) findViewById(R.id.btn);
-        btn.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                show();
-            }
-        });
+
+        FloatBallMenu menu = new FloatBallMenu();
+        mFloatBall = new FloatBall(this, menu);
         mFloatBall.setLayoutGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
     }
 
-    private void createDesktopLayout() {
-        FloatBallMenu menu = new FloatBallMenu();
-        mFloatBall = new FloatBall(this, menu);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        show();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dismiss();
+    }
+
 
     private void show() {
         mFloatBall.show();
