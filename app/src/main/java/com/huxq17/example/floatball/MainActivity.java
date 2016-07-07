@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 
 public class MainActivity extends Activity {
@@ -24,7 +25,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         FloatBallMenu menu = new FloatBallMenu();
-        mFloatBall = new FloatBall(this, menu);
+//        mFloatBall = new FloatBall(getApplication(), menu);
+        mFloatBall = (FloatBall) LayoutInflater.from(getApplicationContext()).inflate(R.layout.float_layout, null);
         mFloatBall.setLayoutGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
     }
 
