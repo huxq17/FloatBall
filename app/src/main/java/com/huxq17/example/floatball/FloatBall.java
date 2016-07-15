@@ -62,7 +62,6 @@ public class FloatBall extends ViewGroup {
     public FloatBall(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, null, 0, 0);
-        Log("第三个构造 context=" + context);
     }
 
     /**
