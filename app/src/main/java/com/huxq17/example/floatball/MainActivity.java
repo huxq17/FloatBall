@@ -22,7 +22,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         FloatBallMenu menu = new FloatBallMenu();
         mFloatBall = new FloatBall(this, menu);
 //        mFloatBall = (FloatBall) LayoutInflater.from(this).inflate(R.layout.float_layout, null);
