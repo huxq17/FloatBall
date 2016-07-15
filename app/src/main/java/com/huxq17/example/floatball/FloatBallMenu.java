@@ -134,6 +134,13 @@ public class FloatBallMenu implements IMenu {
         rightLine.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
+    interface FloatBallClick {
+        /**
+         * @return 返回true就隐藏悬浮球，false则不隐藏
+         */
+        boolean onClick();
+    }
+
     private int getId() {
         return IDFactory.getId();
     }

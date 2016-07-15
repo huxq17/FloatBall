@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -58,6 +59,12 @@ public class FloatBall extends ViewGroup {
         init(context, menu, 0, 0);
     }
 
+    public FloatBall(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context, null, 0, 0);
+        Log("第三个构造 context=" + context);
+    }
+
     /**
      * @param context         上下文
      * @param menu            菜单
@@ -104,6 +111,10 @@ public class FloatBall extends ViewGroup {
         });
         this.addView(ivFloatBall, layoutParams);
         leftMenuWidth = menuWidth - floatBallHeight / 2;
+    }
+
+    public void setMenuOperator(IMenu menuOperator) {
+        this.menuOperator = menuOperator;
     }
 
     private void addMenu(Context context) {
@@ -235,6 +246,7 @@ public class FloatBall extends ViewGroup {
         if (layoutfromTouch || mScroller.computeScrollOffset() || mClipScroller.computeScrollOffset()) {
             return;
         }
+        Log("onlayout width=" + getWidth() + ";height=" + getHeight());
         initScreenParams();
         int[] finalLocation = correctLocation();
         doMove(finalLocation[0], finalLocation[1]);
@@ -490,35 +502,6 @@ public class FloatBall extends ViewGroup {
      */
     public void setLayoutGravity(int layoutgravity) {
         mLayoutGravity = layoutgravity;
-    }
-
-    /**
-     * 将悬浮球的中心点移动到触摸点
-     *
-     * @param event
-     */
-    private void moveToCenter(MotionEvent event) {
-        int motionX = (int) event.getX();
-        int motionY = (int) event.getY();
-        int startX = mLayoutParams.x;
-        int startY = mLayoutParams.y;
-        int width = ivFloatBall.getWidth();
-        int height = ivFloatBall.getHeight();
-
-        int offsetX = motionX - width / 2;
-        int offsetY = motionY - height / 2;
-        int gravity = mLayoutParams.gravity;
-        if ((Gravity.RIGHT & gravity) == Gravity.RIGHT) {
-            offsetX = -offsetX;
-        } else if ((Gravity.LEFT & gravity) == Gravity.LEFT) {
-        }
-        if ((Gravity.BOTTOM & gravity) == Gravity.BOTTOM) {
-            offsetY = -offsetY;
-        } else if ((Gravity.TOP & gravity) == Gravity.TOP) {
-        }
-        int finalX = startX + offsetX;
-        int finalY = startY + offsetY;
-        doMove(finalX, finalY);
     }
 
     /**
