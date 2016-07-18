@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.huxq17.example.floatball.interfaces.IMenu;
 
@@ -31,12 +32,20 @@ public class FloatBallMenu implements IMenu {
     }
 
     private void addLeftMenu(RelativeLayout parent) {
+        final Context context = parent.getContext();
         RelativeLayout.LayoutParams childLayoutParams = new RelativeLayout.LayoutParams(DensityUtil.dip2px(parent.getContext(), 52), DensityUtil.dip2px(parent.getContext(), 30));
         childLayoutParams.setMargins(0, 0, DensityUtil.dip2px(parent.getContext(), 20), 0);
         childLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         tvLeftGift = new TextView(parent.getContext());
         tvLeftGift.setId(getId());
         tvLeftGift.setText("福利");
+        tvLeftGift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toast(context, "福利");
+
+            }
+        });
         tvLeftGift.setTextSize(14);
         tvLeftGift.setGravity(Gravity.CENTER);
         tvLeftGift.setTextColor(Color.parseColor("#333333"));
@@ -54,18 +63,37 @@ public class FloatBallMenu implements IMenu {
         tvLeftCenter = new TextView(parent.getContext());
         tvLeftCenter.setId(getId());
         tvLeftCenter.setText("我的");
+        tvLeftCenter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toast(context, "我的");
+
+            }
+        });
         tvLeftCenter.setTextSize(14);
         tvLeftCenter.setGravity(Gravity.CENTER);
         tvLeftCenter.setTextColor(Color.parseColor("#333333"));
         parent.addView(tvLeftCenter, childLayoutParams);
     }
 
+    private void toast(Context context, String msg) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+    }
+
     private void addRightMenu(RelativeLayout parent) {
+        final Context context = parent.getContext();
         RelativeLayout.LayoutParams childLayoutParams = new RelativeLayout.LayoutParams(DensityUtil.dip2px(parent.getContext(), 52), DensityUtil.dip2px(parent.getContext(), 30));
         childLayoutParams.setMargins(DensityUtil.dip2px(parent.getContext(), 20), 0, 0, 0);
         tvRightCenter = new TextView(parent.getContext());
         tvRightCenter.setId(getId());
         tvRightCenter.setText("我的");
+        tvRightCenter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toast(context, "我的");
+
+            }
+        });
         tvRightCenter.setTextSize(14);
         tvRightCenter.setGravity(Gravity.CENTER);
         tvRightCenter.setTextColor(Color.parseColor("#333333"));
@@ -84,6 +112,13 @@ public class FloatBallMenu implements IMenu {
         tvRightGift = new TextView(parent.getContext());
         tvRightGift.setId(getId());
         tvRightGift.setText("福利");
+        tvRightGift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toast(context, "福利");
+
+            }
+        });
         tvRightGift.setTextSize(14);
         tvRightGift.setGravity(Gravity.CENTER);
         tvRightGift.setTextColor(Color.parseColor("#333333"));

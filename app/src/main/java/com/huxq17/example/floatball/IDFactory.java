@@ -23,8 +23,8 @@ public class IDFactory {
      */
     public static int getId() {
         int id = getRandomNumber(10000000, 99999999);
-        if (ids.contains(id)) {
-            id = getId();
+        while (ids.contains(id)) {
+            id = getRandomNumber(10000000, 99999999);
         }
         ids.add(id);
         return id;

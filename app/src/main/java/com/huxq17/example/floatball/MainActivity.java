@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FloatBallMenu menu = new FloatBallMenu();
-        mFloatBall = new FloatBall(this, menu);
+        mFloatBall = new FloatBall(getApplicationContext(), menu);
 //        mFloatBall = (FloatBall) LayoutInflater.from(this).inflate(R.layout.float_layout, null);
         mFloatBall.setLayoutGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
     }
