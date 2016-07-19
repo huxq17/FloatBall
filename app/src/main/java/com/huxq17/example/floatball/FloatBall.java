@@ -2,16 +2,16 @@ package com.huxq17.example.floatball;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
@@ -20,7 +20,7 @@ import android.widget.Scroller;
 
 import com.huxq17.example.floatball.interfaces.IMenu;
 
-public class FloatBall extends RelativeLayout {
+public class FloatBall extends ViewGroup {
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mLayoutParams;
     private float mLastX;
@@ -35,14 +35,15 @@ public class FloatBall extends RelativeLayout {
     private int mLeft;
     private Rect windowRect = new Rect();
     private ImageView ivFloatBall;
-    private ExpanableLayout rightMenu;
-    private ExpanableLayout leftMenu;
-    private int leftMenuWidth, rightMenuWidth;
+    private int leftMenuWidth;
     private int mTouchSlop;
     private boolean isIntercepted = false;
-    private ExpanableLayout showingmenuView;
     private boolean layoutfromTouch = false;
     private boolean isMenuShowing = false;
+    private int menuWidth;
+    private int menuHeight;
+    private ExpanableLayout menu;
+    private int floatBallWidth, floatBallHeight;
 
     private IMenu menuOperator;
 
@@ -52,25 +53,52 @@ public class FloatBall extends RelativeLayout {
 
     public FloatBall(Context context) {
         super(context);
-        init(context, null);
+        init(context, null, 0, 0);
     }
 
     public FloatBall(Context context, IMenu menu) {
         super(context);
-        init(context, menu);
+        init(context, menu, 0, 0);
     }
 
-    private void init(Context context, IMenu menu) {
+    public FloatBall(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context, null, 0, 0);
+    }
+
+    /**
+     * @param context         上下文
+     * @param menu            菜单
+     * @param floatBallWidth  悬浮球宽度
+     * @param floatBallHeight 悬浮球高度
+     */
+    public FloatBall(Context context, IMenu menu, int floatBallWidth, int floatBallHeight) {
+        super(context);
+        init(context, menu, floatBallWidth, floatBallWidth);
+    }
+
+    private void init(Context context, IMenu menu, int fbWidth, int fbHeight) {
+        if (menu != null) {
+            menu.onAttachContext(context.getApplicationContext());
+        }
+        floatBallWidth = DensityUtil.dip2px(getContext(), 40);
+        floatBallHeight = DensityUtil.dip2px(getContext(), 40);
+        if (fbWidth != 0) {
+            floatBallWidth = fbWidth;
+        }
+        if (fbHeight != 0) {
+            floatBallHeight = fbHeight;
+        }
+        mScroller = new Scroller(getContext());
+        mClipScroller = new Scroller(getContext(), new LinearInterpolator());
+        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
         menuOperator = menu;
         addMenu(context);
         ivFloatBall = new ImageView(context);
         ivFloatBall.setId(getId());
         setFloatImage(R.drawable.floatball2, 1);
         ivFloatBall.setScaleType(ImageView.ScaleType.FIT_XY);
-        LayoutParams layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 40), DensityUtil.dip2px(getContext(), 40));
-        layoutParams.addRule(RIGHT_OF, leftMenu.getId());
-        layoutParams.addRule(LEFT_OF, rightMenu.getId());
-        layoutParams.setMargins(-DensityUtil.dip2px(context, 20), 0, -DensityUtil.dip2px(context, 20), 0);
+        LayoutParams layoutParams = new LayoutParams(floatBallWidth, floatBallHeight);
         ivFloatBall.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,37 +106,27 @@ public class FloatBall extends RelativeLayout {
             }
         });
         this.addView(ivFloatBall, layoutParams);
-        leftMenuWidth = rightMenuWidth = DensityUtil.dip2px(getContext(), 135 - 20);
+        leftMenuWidth = menuWidth - floatBallHeight / 2;
+    }
+
+    public void setMenuOperator(IMenu menuOperator) {
+        this.menuOperator = menuOperator;
     }
 
     private void addMenu(Context context) {
-        mScroller = new Scroller(getContext());
-        mClipScroller = new Scroller(getContext(), new LinearInterpolator());
-        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-
-        rightMenu = new ExpanableLayout(context);
-        rightMenu.setId(getId());
-        rightMenu.setOritation(ExpanableLayout.RIGHT);
-        leftMenu = new ExpanableLayout(context);
-        leftMenu.setId(getId());
-        leftMenu.setOritation(ExpanableLayout.LEFT);
-
-        leftMenu.setBackgroundColor(Color.parseColor("#fafafa"));
-        addLeftMenu(leftMenu);
-        rightMenu.setBackgroundColor(Color.parseColor("#fafafa"));
-        addRightMenu(rightMenu);
-
-        LayoutParams layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 135), DensityUtil.dip2px(getContext(), 30));
-        layoutParams.addRule(CENTER_VERTICAL);
-        if (menuOperator != null && menuOperator.isLeftMenuEnable()) {
-            addView(leftMenu, 0, layoutParams);
+        if (menuOperator != null) {
+            menuWidth = menuOperator.getMenuWidth();
+            menuHeight = menuOperator.getMenuHeight();
+        } else {
+            menuWidth = DensityUtil.dip2px(getContext(), 135);
+            menuHeight = DensityUtil.dip2px(getContext(), 30);
         }
-
-        layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 135), DensityUtil.dip2px(getContext(), 30));
-        layoutParams.addRule(RIGHT_OF, leftMenu.getId());
-        layoutParams.addRule(CENTER_VERTICAL);
-        if (menuOperator != null && menuOperator.isRightMenuEnable()) {
-            addView(rightMenu, layoutParams);
+        menu = new ExpanableLayout(context);
+        menu.setId(getId());
+        addMenuContent(menu);
+        LayoutParams layoutParams = new LayoutParams(menuWidth, menuHeight);
+        if (menuOperator != null) {
+            addView(menu, layoutParams);
         }
     }
 
@@ -116,107 +134,75 @@ public class FloatBall extends RelativeLayout {
         return IDFactory.getId();
     }
 
-    private void setFloatImage(int imageid, float alpha) {
-        ivFloatBall.setImageResource(imageid);
+    private void setFloatImage(int imageId, float alpha) {
+        ivFloatBall.setImageResource(imageId);
         ivFloatBall.setAlpha(alpha);
     }
 
-    private void addRightMenu(RelativeLayout parent) {
-        LayoutParams layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 52), DensityUtil.dip2px(getContext(), 30));
+    private void addMenuContent(RelativeLayout parent) {
         if (menuOperator != null) {
-            menuOperator.addRightMenu(parent, layoutParams);
+            menuOperator.addMenu(parent);
         }
     }
 
-    private void addLeftMenu(RelativeLayout parent) {
-        LayoutParams layoutParams = new LayoutParams(DensityUtil.dip2px(getContext(), 52), DensityUtil.dip2px(getContext(), 30));
-        if (menuOperator != null) {
-            menuOperator.addLeftMenu(parent, layoutParams);
-        }
-    }
-
-    public void setOnCenterClickListener(final OnClickListener listener) {
-        if (listener == null) {
-            return;
-        }
-//        tvLeftCenter.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-//        tvRightCenter.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-    }
-
-    public void setOnGiftClickListener(final OnClickListener listener) {
-        if (listener == null) {
-            return;
-        }
-//        tvLeftGift.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-//        tvRightGift.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                clickButton();
-//                listener.onClick(v);
-//            }
-//        });
-    }
-
-    public void clear() {
-//        tvLeftGift.setOnClickListener(null);
-//        tvLeftCenter.setOnClickListener(null);
-//        tvRightCenter.setOnClickListener(null);
-//        tvRightGift.setOnClickListener(null);
-    }
-
-    public void clickButton() {
-        showMenu(false);
+    public void hideFloatBall() {
+        isMenuShowing = false;
+        menu.setOffset(0);
         setVisibility(GONE);
     }
 
+    private static final int Left = 0;
+    private static final int Right = 1;
+
+    private void showMenuSide(int side) {
+        if (menu == null) {
+            return;
+        }
+        switch (side) {
+            case Left:
+                menu.setOritation(ExpanableLayout.LEFT);
+                if (menuOperator != null) {
+                    menuOperator.showingLeftMenu();
+                }
+                break;
+            case Right:
+                menu.setOritation(ExpanableLayout.RIGHT);
+                if (menuOperator != null) {
+                    menuOperator.showingRightMenu();
+                }
+                break;
+        }
+    }
+
     private void showMenu(boolean show) {
-        int width = DensityUtil.dip2px(getContext(), 135);
         int[] floatLocation = new int[2];
         ivFloatBall.getLocationOnScreen(floatLocation);
         int floatLeft = floatLocation[0];
         if (show) {
-            setFloatImage(R.drawable.floatball2, 1);
-            if (floatLeft + ivFloatBall.getHeight() / 2 <= mScreenWidth / 2) {
+            if (floatLeft + ivFloatBall.getWidth() / 2 <= mScreenWidth / 2) {
                 if (menuOperator != null && menuOperator.isRightMenuEnable()) {
                     isMenuShowing = true;
-                    showingmenuView = rightMenu;
+                    showMenuSide(Right);
                 } else {
                     isMenuShowing = false;
                 }
             } else {
                 if (menuOperator != null && menuOperator.isLeftMenuEnable()) {
                     isMenuShowing = true;
-                    showingmenuView =  leftMenu;
+                    showMenuSide(Left);
                 } else {
                     isMenuShowing = false;
                 }
             }
             if (isMenuShowing) {
-                mClipScroller.startScroll(0, 0, width, 0, 300);
+                menu.setVisibility(VISIBLE);
+                mClipScroller.startScroll(0, 0, menuWidth, 0, 300);
                 post(mclipRunnable);
             }
         } else {
             if (isMenuShowing) {
                 isMenuShowing = false;
-                mClipScroller.startScroll(width, 0, -width, 0, 300);
+                mClipScroller.startScroll(menuWidth, 0, -menuWidth, 0, 300);
                 post(mclipRunnable);
             }
         }
@@ -234,6 +220,9 @@ public class FloatBall extends RelativeLayout {
             ((ViewGroup) parent).removeView(this);
         }
         setVisibility(VISIBLE);
+        if (ivFloatBall != null) {
+            ivFloatBall.setClickable(true);
+        }
         if (!isAdded) {
             mWindowManager.addView(this, mLayoutParams);
             fadeOutFloatBall();
@@ -242,14 +231,42 @@ public class FloatBall extends RelativeLayout {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = getChildAt(i);
+            measureChild(child, widthMeasureSpec, heightMeasureSpec);
+        }
+        setMeasuredDimension(menuWidth * 2, ivFloatBall.getMeasuredHeight());
+    }
+
+    @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
         if (layoutfromTouch || mScroller.computeScrollOffset() || mClipScroller.computeScrollOffset()) {
             return;
         }
+        Log("onlayout width=" + getWidth() + ";height=" + getHeight());
         initScreenParams();
         int[] finalLocation = correctLocation();
         doMove(finalLocation[0], finalLocation[1]);
+        int[] floatLocation = new int[2];
+        getLocationOnScreen(floatLocation);
+        int left = floatLocation[0];
+        int menuTop = (getMeasuredHeight() - menu.getMeasuredHeight()) / 2;
+        int menuLeft = 0;
+        if (left == 0 - leftMenuWidth) {//在屏幕的左边
+            menuLeft = menu.getMeasuredWidth();
+        } else if (left == mScreenWidth - getMeasuredWidth() + leftMenuWidth) {//在屏幕的右边
+            menuLeft = 0;
+        }
+        menu.layout(menuLeft, menuTop, menuLeft + menu.getMeasuredWidth(), menuTop + menu.getMeasuredHeight());
+        int floatLeft = l + leftMenuWidth;
+        ivFloatBall.layout(floatLeft, t, floatLeft + ivFloatBall.getMeasuredWidth(), t + ivFloatBall.getMeasuredHeight());
+    }
+
+
+    private void Log(String msg) {
+        Log.i("Tag", msg);
     }
 
     @Override
@@ -261,6 +278,9 @@ public class FloatBall extends RelativeLayout {
                 layoutfromTouch = true;
                 mLastX = event.getRawX();
                 mLastY = event.getRawY();
+                if (isTouchFloatBall(event)) {
+                    setFloatImage(R.drawable.floatball2, 1);
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 float x = event.getRawX();
@@ -271,20 +291,25 @@ public class FloatBall extends RelativeLayout {
                     if (Math.abs(deltaX) > mTouchSlop || Math.abs(deltaY) > mTouchSlop) {
                         sendCancelEvent(event);
                         isIntercepted = true;
-                        if (isMenuShowing && showingmenuView != null) {
+                        if (isMenuShowing && menu != null) {
                             isMenuShowing = false;
-                            showingmenuView.setOffset(0);
+                            setMenuOffset(0);
                         }
                     } else {
                         return super.dispatchTouchEvent(event);
                     }
                 }
-                move(deltaX, deltaY);
+                if (hasTouchFloatBall || isTouchFloatBall(event)) {
+                    hasTouchFloatBall = true;
+                }
+                if (hasTouchFloatBall && !isMenuShowing || isMenuShowing)
+                    move(deltaX, deltaY);
                 mLastX = x;
                 mLastY = y;
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+                hasTouchFloatBall = false;
                 layoutfromTouch = false;
                 isIntercepted = false;
                 onFingerReleased();
@@ -296,6 +321,33 @@ public class FloatBall extends RelativeLayout {
         return super.dispatchTouchEvent(event);
     }
 
+    private void setMenuOffset(int offset) {
+        menu.setOffset(offset);
+        menu.setVisibility(offset == 0 ? GONE : VISIBLE);
+    }
+
+    private boolean hasTouchFloatBall = false;
+
+    /**
+     * 是否摸到了某个view
+     *
+     * @param ev
+     * @return
+     */
+    private boolean isTouchFloatBall(MotionEvent ev) {
+        if (ivFloatBall != null && ivFloatBall.getVisibility() == VISIBLE) {
+            Rect bounds = new Rect();
+            ivFloatBall.getGlobalVisibleRect(bounds);
+            int x = (int) ev.getX();
+            int y = (int) ev.getY();
+            if (bounds.contains(x, y)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
 
     private void sendCancelEvent(MotionEvent lastEvent) {
         MotionEvent last = lastEvent;
@@ -354,7 +406,11 @@ public class FloatBall extends RelativeLayout {
             }
             mScreenWidth = windowRect.right;
             mScreenHeight = windowRect.bottom;
-            int contentTop = activity.getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();
+//            int contentTop = activity.getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();
+        } else {
+            mTop = Utils.getStatusHeight(getContext());
+            mScreenWidth = Utils.getScreenWidth(getContext());
+            mScreenHeight = Utils.getScreenHeight(getContext());
         }
     }
 
@@ -381,12 +437,6 @@ public class FloatBall extends RelativeLayout {
         mWindowManager.updateViewLayout(this, mLayoutParams);
     }
 
-    private void swapHeightAndWidth() {
-        mScreenWidth = mScreenHeight + mScreenWidth;
-        mScreenHeight = mScreenWidth - mScreenHeight;
-        mScreenWidth = mScreenWidth - mScreenHeight;
-    }
-
     private void move(int deltaX, int deltaY) {
         int gravity = mLayoutParams.gravity;
         if ((Gravity.RIGHT & gravity) == Gravity.RIGHT) {
@@ -407,17 +457,19 @@ public class FloatBall extends RelativeLayout {
     private class ClipRunnable implements Runnable {
         @Override
         public void run() {
-            if (mClipScroller.computeScrollOffset() && showingmenuView != null) {
+            if (mClipScroller.computeScrollOffset() && menu != null) {
                 ivFloatBall.setClickable(false);
                 final int currentX = mClipScroller.getCurrX();
-                showingmenuView.setOffset(currentX);
+                menu.setOffset(currentX);
                 if (currentX == mClipScroller.getFinalX()) {
                     ivFloatBall.setClickable(true);
+                    if (currentX == 0) {
+                        menu.setVisibility(GONE);
+                    }
                 }
                 post(this);
             }
         }
-
     }
 
     private void fadeOutFloatBall() {
@@ -444,17 +496,15 @@ public class FloatBall extends RelativeLayout {
             if (mScroller.computeScrollOffset()) {
                 final int currentX = mScroller.getCurrX();
                 final int currentY = mScroller.getCurrY();
-                if (currentX != mScroller.getFinalX()
-                        || currentY != mScroller.getFinalY()) {
-                    doMove(currentX, currentY);
-                    post(this);
-                } else {
-                    removeCallbacks(this);
-                    mScroller.forceFinished(true);
-                    fadeOutFloatBall();
-                }
+                doMove(currentX, currentY);
+                post(this);
             } else {
                 removeCallbacks(this);
+                mScroller.forceFinished(true);
+                fadeOutFloatBall();
+                requestLayout();
+                removeCallbacks(this);
+
             }
         }
     };
@@ -506,34 +556,5 @@ public class FloatBall extends RelativeLayout {
             return true;
         }
         return false;
-    }
-
-    /**
-     * 将悬浮球的中心点移动到触摸点
-     *
-     * @param event
-     */
-    private void moveToCenter(MotionEvent event) {
-        int motionX = (int) event.getX();
-        int motionY = (int) event.getY();
-        int startX = mLayoutParams.x;
-        int startY = mLayoutParams.y;
-        int width = ivFloatBall.getWidth();
-        int height = ivFloatBall.getHeight();
-
-        int offsetX = motionX - width / 2;
-        int offsetY = motionY - height / 2;
-        int gravity = mLayoutParams.gravity;
-        if ((Gravity.RIGHT & gravity) == Gravity.RIGHT) {
-            offsetX = -offsetX;
-        } else if ((Gravity.LEFT & gravity) == Gravity.LEFT) {
-        }
-        if ((Gravity.BOTTOM & gravity) == Gravity.BOTTOM) {
-            offsetY = -offsetY;
-        } else if ((Gravity.TOP & gravity) == Gravity.TOP) {
-        }
-        int finalX = startX + offsetX;
-        int finalY = startY + offsetY;
-        doMove(finalX, finalY);
     }
 }

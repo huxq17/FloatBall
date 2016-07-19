@@ -6,14 +6,8 @@
     android:background="#cecece"
     tools:context="com.huxq17.example.floatball.MainActivity">
 
-    <Button
-        android:id="@+id/btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="年轻人，点我吧" />
 
     <Button
-        android:layout_below="@+id/btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="changeOrientation"
