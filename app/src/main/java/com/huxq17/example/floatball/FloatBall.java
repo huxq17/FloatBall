@@ -506,6 +506,7 @@ public class FloatBall extends ViewGroup {
             } else {
                 removeCallbacks(this);
                 fadeOutFloatBall();
+                requestLayout();
             }
         }
     };
