@@ -1,6 +1,5 @@
 package com.huxq17.example.floatball;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -281,11 +280,11 @@ public class FloatBall extends ViewGroup {
         int action = event.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                removeCallbacks(mFadeOutRunnable);
                 layoutfromTouch = true;
                 mLastX = event.getRawX();
                 mLastY = event.getRawY();
                 if (isTouchFloatBall(event)) {
+                    removeCallbacks(mFadeOutRunnable);
                     setFloatImage(R.drawable.floatball2, 1);
                 }
                 break;
@@ -399,25 +398,9 @@ public class FloatBall extends ViewGroup {
     }
 
     private void initScreenParams() {
-        Activity activity = null;
-        if (getContext() instanceof Activity) {
-            activity = (Activity) getContext();
-            activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
-
-            mLeft = windowRect.left;
-            if (mTop == 0) {
-                //不知道为什么横竖屏切换以后，这里获取到的值总是0，
-                // 考虑到statebarHeight是固定的，在第一次获取到以后就不再获取
-                mTop = windowRect.top;
-            }
-            mScreenWidth = windowRect.right;
-            mScreenHeight = windowRect.bottom;
-//            int contentTop = activity.getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();
-        } else {
-            mTop = Utils.getStatusHeight(getContext());
-            mScreenWidth = Utils.getScreenWidth(getContext());
-            mScreenHeight = Utils.getScreenHeight(getContext());
-        }
+        mTop = Utils.getStatusHeight(getContext());
+        mScreenWidth = Utils.getScreenWidth(getContext());
+        mScreenHeight = Utils.getScreenHeight(getContext());
     }
 
     public void startScroll(int finalLeft, int finalTop, int duration) {
