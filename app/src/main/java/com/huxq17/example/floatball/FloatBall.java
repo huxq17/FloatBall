@@ -44,6 +44,7 @@ public class FloatBall extends ViewGroup {
     private int menuHeight;
     private ExpanableLayout menu;
     private int floatBallWidth, floatBallHeight;
+    private int SCROLL_DURATION = 300;
 
     private IMenu menuOperator;
 
@@ -74,12 +75,12 @@ public class FloatBall extends ViewGroup {
      */
     public FloatBall(Context context, IMenu menu, int floatBallWidth, int floatBallHeight) {
         super(context);
-        init(context, menu, floatBallWidth, floatBallWidth);
+        init(context, menu, floatBallWidth, floatBallHeight);
     }
 
     private void init(Context context, IMenu menu, int fbWidth, int fbHeight) {
         if (menu != null) {
-            menu.onAttachContext(context.getApplicationContext());
+            menu.onAttach(this, context.getApplicationContext());
         }
         floatBallWidth = DensityUtil.dip2px(getContext(), 40);
         floatBallHeight = DensityUtil.dip2px(getContext(), 40);
@@ -147,8 +148,17 @@ public class FloatBall extends ViewGroup {
 
     public void hideFloatBall() {
         isMenuShowing = false;
+        removeCallbacks(mclipRunnable);
         menu.setOffset(0);
         setVisibility(GONE);
+    }
+
+    public void hideMenu() {
+        showMenu(false);
+    }
+
+    public void showMenu() {
+        showMenu(true);
     }
 
     private static final int Left = 0;
@@ -178,6 +188,7 @@ public class FloatBall extends ViewGroup {
         int[] floatLocation = new int[2];
         ivFloatBall.getLocationOnScreen(floatLocation);
         int floatLeft = floatLocation[0];
+        removeCallbacks(mclipRunnable);
         if (show) {
             if (floatLeft + ivFloatBall.getWidth() / 2 <= mScreenWidth / 2) {
                 if (menuOperator != null && menuOperator.isRightMenuEnable()) {
@@ -196,13 +207,13 @@ public class FloatBall extends ViewGroup {
             }
             if (isMenuShowing) {
                 menu.setVisibility(VISIBLE);
-                mClipScroller.startScroll(0, 0, menuWidth, 0, 300);
+                mClipScroller.startScroll(0, 0, menuWidth, 0, SCROLL_DURATION);
                 post(mclipRunnable);
             }
         } else {
             if (isMenuShowing) {
                 isMenuShowing = false;
-                mClipScroller.startScroll(menuWidth, 0, -menuWidth, 0, 300);
+                mClipScroller.startScroll(menuWidth, 0, -menuWidth, 0, SCROLL_DURATION);
                 post(mclipRunnable);
             }
         }
@@ -220,9 +231,6 @@ public class FloatBall extends ViewGroup {
             ((ViewGroup) parent).removeView(this);
         }
         setVisibility(VISIBLE);
-        if (ivFloatBall != null) {
-            ivFloatBall.setClickable(true);
-        }
         if (!isAdded) {
             mWindowManager.addView(this, mLayoutParams);
             fadeOutFloatBall();
@@ -245,7 +253,6 @@ public class FloatBall extends ViewGroup {
         if (layoutfromTouch || mScroller.computeScrollOffset() || mClipScroller.computeScrollOffset()) {
             return;
         }
-        Log("onlayout width=" + getWidth() + ";height=" + getHeight());
         initScreenParams();
         int[] finalLocation = correctLocation();
         doMove(finalLocation[0], finalLocation[1]);
@@ -313,7 +320,6 @@ public class FloatBall extends ViewGroup {
                 layoutfromTouch = false;
                 isIntercepted = false;
                 onFingerReleased();
-                ivFloatBall.setClickable(true);
                 break;
             default:
                 break;
@@ -425,8 +431,9 @@ public class FloatBall extends ViewGroup {
 
     private void onFingerReleased() {
         int[] finalLocation = correctLocation();
-        startScroll(finalLocation[0], finalLocation[1], 300);
+        startScroll(finalLocation[0], finalLocation[1], SCROLL_DURATION);
     }
+
 
     private void doMove(int x, int y) {
         if (mWindowManager == null || mLayoutParams == null) {
@@ -458,16 +465,14 @@ public class FloatBall extends ViewGroup {
         @Override
         public void run() {
             if (mClipScroller.computeScrollOffset() && menu != null) {
-                ivFloatBall.setClickable(false);
                 final int currentX = mClipScroller.getCurrX();
                 menu.setOffset(currentX);
-                if (currentX == mClipScroller.getFinalX()) {
-                    ivFloatBall.setClickable(true);
-                    if (currentX == 0) {
-                        menu.setVisibility(GONE);
-                    }
+                if (currentX == mClipScroller.getFinalX() && currentX == 0) {
+                    menu.setVisibility(GONE);
                 }
                 post(this);
+            } else {
+                removeCallbacks(this);
             }
         }
     }
@@ -500,11 +505,7 @@ public class FloatBall extends ViewGroup {
                 post(this);
             } else {
                 removeCallbacks(this);
-                mScroller.forceFinished(true);
                 fadeOutFloatBall();
-                requestLayout();
-                removeCallbacks(this);
-
             }
         }
     };

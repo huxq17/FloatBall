@@ -3,6 +3,8 @@ package com.huxq17.example.floatball.interfaces;
 import android.content.Context;
 import android.widget.RelativeLayout;
 
+import com.huxq17.example.floatball.FloatBall;
+
 /**
  * Created by huxq17 on 2016/6/30.
  */
@@ -10,9 +12,10 @@ public interface IMenu {
     /**
      * 绑定context,可以在这个方法里做一些初始话的操作
      *
+     * @param floatBall 悬浮球
      * @param context 传入的是application context，可以用来获取宽度和长度等值
      */
-    void onAttachContext(Context context);
+    void onAttach(FloatBall floatBall,Context context);
 
     /**
      * 添加悬浮球菜单的内容

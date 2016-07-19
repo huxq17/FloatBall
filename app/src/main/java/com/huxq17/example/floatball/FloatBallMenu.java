@@ -17,11 +17,13 @@ public class FloatBallMenu implements IMenu {
     private TextView tvLeftCenter, tvRightCenter, tvLeftGift, tvRightGift;
     private View leftLine, rightLine;
     private int menuWidth, menuHeight;
+    private FloatBall mFloatBall;
 
     @Override
-    public void onAttachContext(Context context) {
+    public void onAttach(FloatBall floatBall, Context context) {
         menuWidth = DensityUtil.dip2px(context, 135);
         menuHeight = DensityUtil.dip2px(context, 30);
+        this.mFloatBall = floatBall;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "福利");
-
+                mFloatBall.hideMenu();
             }
         });
         tvLeftGift.setTextSize(14);
@@ -67,7 +69,7 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "我的");
-
+                mFloatBall.hideMenu();
             }
         });
         tvLeftCenter.setTextSize(14);
@@ -77,7 +79,9 @@ public class FloatBallMenu implements IMenu {
     }
 
     private void toast(Context context, String msg) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 100);
+        toast.show();
     }
 
     private void addRightMenu(RelativeLayout parent) {
@@ -91,7 +95,7 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "我的");
-
+                mFloatBall.hideMenu();
             }
         });
         tvRightCenter.setTextSize(14);
@@ -116,7 +120,7 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "福利");
-
+                mFloatBall.hideMenu();
             }
         });
         tvRightGift.setTextSize(14);
