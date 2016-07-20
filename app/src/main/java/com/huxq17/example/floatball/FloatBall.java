@@ -44,43 +44,106 @@ public class FloatBall extends ViewGroup {
     private ExpanableLayout menu;
     private int floatBallWidth, floatBallHeight;
     private int SCROLL_DURATION = 300;
+    private SingleIcon singleIcon;
+    private DoubleIcon doubleIcon;
 
     private IMenu menuOperator;
 
-//    public void setIsHiddenWhenExit(boolean isHiddenWhenExit) {
+    //    public void setIsHiddenWhenExit(boolean isHiddenWhenExit) {
 //        this.isHiddenWhenExit = isHiddenWhenExit;
 //    }
+    public static class Builder {
+        private Context context;
+        private int width, height;
+        private IMenu iMenu;
+        private SingleIcon singleIcon;
+        private DoubleIcon doubleIcon;
 
-    public FloatBall(Context context) {
-        super(context);
-        init(context, null, 0, 0);
-    }
 
-    public FloatBall(Context context, IMenu menu) {
-        super(context);
-        init(context, menu, 0, 0);
+        public Builder(Context context) {
+            this.context = context;
+        }
+
+        /**
+         * 设置悬浮球的菜单
+         *
+         * @param menu
+         * @return
+         */
+        public Builder menu(IMenu menu) {
+            this.iMenu = menu;
+            return this;
+        }
+
+        /**
+         * 设置悬浮球的宽度
+         *
+         * @param width
+         * @return
+         */
+        public Builder width(int width) {
+            this.width = width;
+            return this;
+        }
+
+        /**
+         * 设置悬浮球的高度
+         *
+         * @param height
+         * @return
+         */
+        public Builder height(int height) {
+            this.height = height;
+            return this;
+        }
+
+        /**
+         * 设置悬浮球显示的图片和在点击以后和正常两种状态下图片显示的透明度
+         *
+         * @param singleIcon
+         * @return
+         */
+        public Builder icon(SingleIcon singleIcon) {
+            this.singleIcon = singleIcon;
+            this.doubleIcon = null;
+            return this;
+        }
+
+        /**
+         * 设置悬浮球在点击以后和正常两种状态下显示的两张图片
+         *
+         * @param doubleIcon
+         * @return
+         */
+        public Builder doubleIcon(DoubleIcon doubleIcon) {
+            this.doubleIcon = doubleIcon;
+            this.singleIcon = null;
+            return this;
+        }
+
+        public FloatBall build() {
+            FloatBall floatBall = new FloatBall(context, iMenu, singleIcon, doubleIcon, width, height);
+            return floatBall;
+        }
     }
 
     public FloatBall(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, null, 0, 0);
+        init(context, null, null, null, 0, 0);
     }
 
-    /**
-     * @param context         上下文
-     * @param menu            菜单
-     * @param floatBallWidth  悬浮球宽度
-     * @param floatBallHeight 悬浮球高度
-     */
-    public FloatBall(Context context, IMenu menu, int floatBallWidth, int floatBallHeight) {
+    private FloatBall(Context context, IMenu menu, SingleIcon singleIcon, DoubleIcon doubleIcon, int floatBallWidth, int floatBallHeight) {
         super(context);
-        init(context, menu, floatBallWidth, floatBallHeight);
+        init(context, menu, singleIcon, doubleIcon, floatBallWidth, floatBallHeight);
     }
 
-    private void init(Context context, IMenu menu, int fbWidth, int fbHeight) {
+    private void init(Context context, IMenu menu, SingleIcon singleIcon, DoubleIcon doubleIcon, int fbWidth, int fbHeight) {
         if (menu != null) {
             menu.onAttach(this, context.getApplicationContext());
         }
+        this.singleIcon = singleIcon;
+        this.doubleIcon = doubleIcon;
+        menuOperator = menu;
         floatBallWidth = DensityUtil.dip2px(getContext(), 40);
         floatBallHeight = DensityUtil.dip2px(getContext(), 40);
         if (fbWidth != 0) {
@@ -92,11 +155,10 @@ public class FloatBall extends ViewGroup {
         mScroller = new Scroller(getContext());
         mClipScroller = new Scroller(getContext(), new LinearInterpolator());
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-        menuOperator = menu;
         addMenu(context);
         ivFloatBall = new ImageView(context);
         ivFloatBall.setId(getId());
-        setFloatImage(R.drawable.floatball2, 1);
+        setFloatImage(true);
         ivFloatBall.setScaleType(ImageView.ScaleType.FIT_XY);
         LayoutParams layoutParams = new LayoutParams(floatBallWidth, floatBallHeight);
         ivFloatBall.setOnClickListener(new OnClickListener() {
@@ -107,10 +169,6 @@ public class FloatBall extends ViewGroup {
         });
         this.addView(ivFloatBall, layoutParams);
         leftMenuWidth = menuWidth - floatBallHeight / 2;
-    }
-
-    public void setMenuOperator(IMenu menuOperator) {
-        this.menuOperator = menuOperator;
     }
 
     private void addMenu(Context context) {
@@ -134,9 +192,13 @@ public class FloatBall extends ViewGroup {
         return IDFactory.getId();
     }
 
-    private void setFloatImage(int imageId, float alpha) {
-        ivFloatBall.setImageResource(imageId);
-        ivFloatBall.setAlpha(alpha);
+    private void setFloatImage(boolean enable) {
+        if (singleIcon != null) {
+            ivFloatBall.setImageResource(singleIcon.bitmap);
+            ivFloatBall.setAlpha(enable ? singleIcon.enable : singleIcon.normal);
+        } else if (doubleIcon != null) {
+            ivFloatBall.setImageResource(enable ? doubleIcon.enable : doubleIcon.normal);
+        }
     }
 
     private void addMenuContent(RelativeLayout parent) {
@@ -285,7 +347,7 @@ public class FloatBall extends ViewGroup {
                 mLastY = event.getRawY();
                 if (isTouchFloatBall(event)) {
                     removeCallbacks(mFadeOutRunnable);
-                    setFloatImage(R.drawable.floatball2, 1);
+                    setFloatImage(true);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -472,7 +534,7 @@ public class FloatBall extends ViewGroup {
         @Override
         public void run() {
             if (!isMenuShowing) {
-                setFloatImage(R.drawable.floatball2, 0.3f);
+                setFloatImage(false);
             }
         }
     }
@@ -524,6 +586,35 @@ public class FloatBall extends ViewGroup {
      */
     public void setLayoutGravity(int layoutgravity) {
         mLayoutGravity = layoutgravity;
+    }
+
+    public static class DoubleIcon {
+        public int normal, enable;
+
+        /**
+         * @param enable 点击悬浮球以后显示的图片
+         * @param normal 普通状态下悬浮球上显示的图片
+         */
+        public DoubleIcon(int enable, int normal) {
+            this.normal = normal;
+            this.enable = enable;
+        }
+    }
+
+    public static class SingleIcon {
+        public float normal, enable;
+        public int bitmap;
+
+        /**
+         * @param icon
+         * @param enable 图标点击以后的透明度,范围是0~1,正常是1
+         * @param normal 图标普通状态的下的透明度,范围是0~1
+         */
+        public SingleIcon(int icon, float enable, float normal) {
+            this.bitmap = icon;
+            this.normal = normal;
+            this.enable = enable;
+        }
     }
 
     /**
