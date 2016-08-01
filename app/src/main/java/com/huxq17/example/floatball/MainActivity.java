@@ -25,8 +25,13 @@ public class MainActivity extends Activity {
         FloatBallMenu menu = new FloatBallMenu();
         FloatBall.SingleIcon singleIcon = new FloatBall.SingleIcon(R.drawable.floatball2, 1f, 0.3f);
         FloatBall.DoubleIcon doubleIcon = new FloatBall.DoubleIcon(R.drawable.floatball2, R.drawable.floatball1);
+        //两种状态两张图片的两种写法
+//        mFloatBall = new FloatBall.Builder(getApplicationContext()).menu(menu).doubleIcon(doubleIcon).build();
 //        mFloatBall = new FloatBall.Builder(getApplicationContext()).menu(menu).icon(singleIcon).doubleIcon(doubleIcon).build();
-        mFloatBall = new FloatBall.Builder(getApplicationContext()).menu(menu).doubleIcon(doubleIcon).icon(singleIcon).build();
+        //一张图片两种状态的两种写法
+//        mFloatBall = new FloatBall.Builder(getApplicationContext()).menu(menu).doubleIcon(doubleIcon).icon(singleIcon).build();
+        mFloatBall = new FloatBall.Builder(getApplicationContext()).menu(menu).icon(singleIcon).build();
+
 //        mFloatBall = (FloatBall) LayoutInflater.from(this).inflate(R.layout.float_layout, null);
         mFloatBall.setLayoutGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
     }
@@ -40,7 +45,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        dismiss();
+//        dismiss();
     }
 
     private void show() {

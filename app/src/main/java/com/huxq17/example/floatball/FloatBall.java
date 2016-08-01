@@ -1,6 +1,7 @@
 package com.huxq17.example.floatball;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -185,7 +186,13 @@ public class FloatBall extends ViewGroup {
         LayoutParams layoutParams = new LayoutParams(menuWidth, menuHeight);
         if (menuOperator != null) {
             addView(menu, layoutParams);
+//            menu.setVisibility(GONE);
         }
+        //如果没有背景，则设置透明的背景，不然不会出现动画展开和缩放的动画
+        if (menu.getBackground() == null) {
+            menu.setBackgroundColor(Color.TRANSPARENT);
+        }
+        setMenuOffset(0);
     }
 
     public int getId() {

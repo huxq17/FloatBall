@@ -28,9 +28,15 @@ public class FloatBallMenu implements IMenu {
 
     @Override
     public void addMenu(RelativeLayout parent) {
+        //设置菜单的背景色
         parent.setBackgroundColor(Color.parseColor("#fafafa"));
+
         addLeftMenu(parent);
         addRightMenu(parent);
+
+        //默认状态下隐藏菜单
+        showLeft(false);
+        showRight(false);
     }
 
     private void addLeftMenu(RelativeLayout parent) {
@@ -162,15 +168,15 @@ public class FloatBallMenu implements IMenu {
     }
 
     private void showRight(boolean show) {
-        tvLeftCenter.setVisibility(show ? View.VISIBLE : View.GONE);
-        tvLeftGift.setVisibility(show ? View.VISIBLE : View.GONE);
-        leftLine.setVisibility(show ? View.VISIBLE : View.GONE);
+        tvLeftCenter.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        tvLeftGift.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        leftLine.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void showLeft(boolean show) {
-        tvRightCenter.setVisibility(show ? View.VISIBLE : View.GONE);
-        tvRightGift.setVisibility(show ? View.VISIBLE : View.GONE);
-        rightLine.setVisibility(show ? View.VISIBLE : View.GONE);
+        tvRightCenter.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        tvRightGift.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        rightLine.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
     private int getId() {

@@ -2,7 +2,6 @@ package com.huxq17.example.floatball;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -60,18 +59,16 @@ public class ExpanableLayout extends RelativeLayout {
     }
 
     public void setOffset(int offset) {
-        if (getBackground() == null) {
-            setBackgroundColor(Color.TRANSPARENT);
-        }
         this.offset = offset;
         ViewCompat.postInvalidateOnAnimation(this);
     }
 
     private int offset = 0;
+    private Path path = new Path();
 
     private void drawLeft(Canvas canvas) {
         int height = getHeight();
-        Path path = new Path();
+        path.reset();
         path.moveTo(0, height);
         path.lineTo(0, 0);
         path.lineTo(getWidth() - height / 2 - offset, 0);
@@ -85,7 +82,7 @@ public class ExpanableLayout extends RelativeLayout {
 
     private void drawRight(Canvas canvas) {
         int height = getHeight();
-        Path path = new Path();
+        path.reset();
         path.moveTo(getWidth(), getHeight());
         path.lineTo(getWidth(), 0);
         path.lineTo(offset - height / 2, 0);
