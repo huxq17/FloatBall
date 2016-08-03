@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
 /**
- * Created by 2144 on 2016/5/25.
+ * Created by huxq17 on 2016/5/25.
  */
 public class ExpanableLayout extends RelativeLayout {
     private Paint abovePaint;
