@@ -356,6 +356,9 @@ public class FloatBall extends ViewGroup {
                     removeCallbacks(mFadeOutRunnable);
                     setFloatImage(true);
                 }
+                if (isTouchFloatBall(event)) {
+                    hasTouchFloatBall = true;
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 float x = event.getRawX();
