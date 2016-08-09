@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -44,7 +45,7 @@ public class FloatBall extends ViewGroup {
     private int menuHeight;
     private ExpanableLayout menu;
     private int floatBallWidth, floatBallHeight;
-    private int SCROLL_DURATION = 300;
+    private int SCROLL_DURATION = 600;
     private SingleIcon singleIcon;
     private DoubleIcon doubleIcon;
 
@@ -216,7 +217,7 @@ public class FloatBall extends ViewGroup {
 
     public void hideFloatBall() {
         isMenuShowing = false;
-        removeCallbacks(mclipRunnable);
+        stopClipRunner();
         menu.setOffset(0);
         setVisibility(GONE);
     }
@@ -256,7 +257,8 @@ public class FloatBall extends ViewGroup {
         int[] floatLocation = new int[2];
         ivFloatBall.getLocationOnScreen(floatLocation);
         int floatLeft = floatLocation[0];
-        removeCallbacks(mclipRunnable);
+        stopClipRunner();
+        Log("showmenu show=" + show);
         if (show) {
             if (floatLeft + ivFloatBall.getWidth() / 2 <= mScreenWidth / 2) {
                 if (menuOperator != null && menuOperator.isRightMenuEnable()) {
@@ -318,7 +320,7 @@ public class FloatBall extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (layoutfromTouch || mScroller.computeScrollOffset() || mClipScroller.computeScrollOffset()) {
+        if (layoutfromTouch /*|| mScroller.computeScrollOffset()*/ || mClipScroller.computeScrollOffset()) {
             return;
         }
         initScreenParams();
@@ -361,6 +363,7 @@ public class FloatBall extends ViewGroup {
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
+                Log("action move hasTouchFloatBall="+hasTouchFloatBall);
                 float x = event.getRawX();
                 float y = event.getRawY();
                 int deltaX = (int) (x - mLastX);
@@ -387,6 +390,7 @@ public class FloatBall extends ViewGroup {
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+                Log("action up or cancel");
                 hasTouchFloatBall = false;
                 layoutfromTouch = false;
                 isIntercepted = false;
@@ -519,14 +523,19 @@ public class FloatBall extends ViewGroup {
     private class ClipRunnable implements Runnable {
         @Override
         public void run() {
+            final int currentX = mClipScroller.getCurrX();
+            Log("ClipRunnable run currentX=" + currentX + ";finalX=" + mClipScroller.getFinalX());
             if (mClipScroller.computeScrollOffset() && menu != null) {
-                final int currentX = mClipScroller.getCurrX();
                 menu.setOffset(currentX);
                 if (currentX == mClipScroller.getFinalX() && currentX == 0) {
                     menu.setVisibility(GONE);
                 }
                 post(this);
-            } else {
+            } else if (menu != null) {
+                menu.setOffset(currentX);
+                if (currentX == mClipScroller.getFinalX() && currentX == 0) {
+                    menu.setVisibility(GONE);
+                }
                 removeCallbacks(this);
             }
         }
@@ -534,7 +543,7 @@ public class FloatBall extends ViewGroup {
 
     private void fadeOutFloatBall() {
         removeCallbacks(mFadeOutRunnable);
-        postDelayed(mFadeOutRunnable, 5000);
+        postDelayed(mFadeOutRunnable, 2000);
     }
 
     private FadeOutRunnable mFadeOutRunnable = new FadeOutRunnable();
@@ -543,7 +552,7 @@ public class FloatBall extends ViewGroup {
 
         @Override
         public void run() {
-            if (!isMenuShowing) {
+            if (!isMenuShowing && !hasTouchFloatBall) {
                 setFloatImage(false);
             }
         }
@@ -570,10 +579,18 @@ public class FloatBall extends ViewGroup {
         if (isAdded && mWindowManager != null) {
             mWindowManager.removeView(this);
         }
-        removeCallbacks(mclipRunnable);
         removeCallbacks(mFadeOutRunnable);
-        removeCallbacks(mScrollRunnable);
+        stopClipRunner();
+        stopScrollRunner();
         isAdded = false;
+    }
+
+    private void stopScrollRunner() {
+        mScroller.abortAnimation();
+    }
+
+    private void stopClipRunner() {
+        mClipScroller.abortAnimation();
     }
 
     /**
@@ -583,7 +600,11 @@ public class FloatBall extends ViewGroup {
         Context context = isHiddenWhenExit ? getContext() : getContext().getApplicationContext();
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         mLayoutParams = new WindowManager.LayoutParams();
-        mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        } else {
+            mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
         mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mLayoutParams.format = PixelFormat.RGBA_8888;
         mLayoutParams.gravity = mLayoutGravity;
