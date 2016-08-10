@@ -45,7 +45,7 @@ public class FloatBall extends ViewGroup {
     private int menuHeight;
     private ExpanableLayout menu;
     private int floatBallWidth, floatBallHeight;
-    private int SCROLL_DURATION = 600;
+    private int SCROLL_DURATION = 300;
     private SingleIcon singleIcon;
     private DoubleIcon doubleIcon;
 
@@ -170,7 +170,7 @@ public class FloatBall extends ViewGroup {
             }
         });
         this.addView(ivFloatBall, layoutParams);
-        leftMenuWidth = menuWidth - floatBallHeight / 2;
+        leftMenuWidth = menuWidth - floatBallWidth / 2;
     }
 
     private void addMenu(Context context) {
@@ -226,6 +226,11 @@ public class FloatBall extends ViewGroup {
         showMenu(false);
     }
 
+    public void hideMenuImmediately() {
+        isMenuShowing = false;
+        setMenuOffset(0);
+    }
+
     public void showMenu() {
         showMenu(true);
     }
@@ -254,13 +259,9 @@ public class FloatBall extends ViewGroup {
     }
 
     private void showMenu(boolean show) {
-        int[] floatLocation = new int[2];
-        ivFloatBall.getLocationOnScreen(floatLocation);
-        int floatLeft = floatLocation[0];
         stopClipRunner();
-        Log("showmenu show=" + show);
         if (show) {
-            if (floatLeft + ivFloatBall.getWidth() / 2 <= mScreenWidth / 2) {
+            if (isOnLeft()) {
                 if (menuOperator != null && menuOperator.isRightMenuEnable()) {
                     isMenuShowing = true;
                     showMenuSide(Right);
@@ -318,27 +319,32 @@ public class FloatBall extends ViewGroup {
         setMeasuredDimension(menuWidth * 2, ivFloatBall.getMeasuredHeight());
     }
 
+    private boolean forceLayout = false;
+
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (layoutfromTouch /*|| mScroller.computeScrollOffset()*/ || mClipScroller.computeScrollOffset()) {
+        if (!forceLayout && (layoutfromTouch || mScroller.computeScrollOffset() || mClipScroller.computeScrollOffset())) {
             return;
         }
         initScreenParams();
         int[] finalLocation = correctLocation();
-        doMove(finalLocation[0], finalLocation[1]);
+        if (!forceLayout)
+            doMove(finalLocation[0], finalLocation[1]);
         int[] floatLocation = new int[2];
         getLocationOnScreen(floatLocation);
         int left = floatLocation[0];
         int menuTop = (getMeasuredHeight() - menu.getMeasuredHeight()) / 2;
         int menuLeft = 0;
-        if (left == 0 - leftMenuWidth) {//在屏幕的左边
+        if (isOnLeft()) {
             menuLeft = menu.getMeasuredWidth();
-        } else if (left == mScreenWidth - getMeasuredWidth() + leftMenuWidth) {//在屏幕的右边
+        } else {
             menuLeft = 0;
         }
         menu.layout(menuLeft, menuTop, menuLeft + menu.getMeasuredWidth(), menuTop + menu.getMeasuredHeight());
         int floatLeft = l + leftMenuWidth;
-        ivFloatBall.layout(floatLeft, t, floatLeft + ivFloatBall.getMeasuredWidth(), t + ivFloatBall.getMeasuredHeight());
+        if (!forceLayout)
+            ivFloatBall.layout(floatLeft, t, floatLeft + ivFloatBall.getMeasuredWidth(), t + ivFloatBall.getMeasuredHeight());
+        forceLayout = false;
     }
 
 
@@ -356,6 +362,8 @@ public class FloatBall extends ViewGroup {
                 mLastY = event.getRawY();
                 if (isTouchFloatBall(event)) {
                     removeCallbacks(mFadeOutRunnable);
+                    removeCallbacks(mScrollRunnable);
+                    mScroller.forceFinished(true);
                     setFloatImage(true);
                 }
                 if (isTouchFloatBall(event)) {
@@ -363,7 +371,6 @@ public class FloatBall extends ViewGroup {
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                Log("action move hasTouchFloatBall="+hasTouchFloatBall);
                 float x = event.getRawX();
                 float y = event.getRawY();
                 int deltaX = (int) (x - mLastX);
@@ -383,14 +390,14 @@ public class FloatBall extends ViewGroup {
                 if (hasTouchFloatBall || isTouchFloatBall(event)) {
                     hasTouchFloatBall = true;
                 }
-                if (hasTouchFloatBall && !isMenuShowing || isMenuShowing)
+                if (hasTouchFloatBall && !isMenuShowing || isMenuShowing) {
                     move(deltaX, deltaY);
-                mLastX = x;
-                mLastY = y;
+                    mLastX = x;
+                    mLastY = y;
+                }
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                Log("action up or cancel");
                 hasTouchFloatBall = false;
                 layoutfromTouch = false;
                 isIntercepted = false;
@@ -405,6 +412,8 @@ public class FloatBall extends ViewGroup {
     private void setMenuOffset(int offset) {
         menu.setOffset(offset);
         menu.setVisibility(offset == 0 ? GONE : VISIBLE);
+        removeCallbacks(mclipRunnable);
+        mClipScroller.setFinalX(0);
     }
 
     private boolean hasTouchFloatBall = false;
@@ -439,6 +448,16 @@ public class FloatBall extends ViewGroup {
                 MotionEvent.ACTION_CANCEL, last.getX(), last.getY(),
                 last.getMetaState());
         super.dispatchTouchEvent(e);
+    }
+
+    private boolean isOnLeft() {
+        int[] floatLocation = new int[2];
+        ivFloatBall.getLocationOnScreen(floatLocation);
+        if (floatLocation[0] + ivFloatBall.getWidth() / 2 > mScreenWidth / 2) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private int[] correctLocation() {
@@ -489,6 +508,9 @@ public class FloatBall extends ViewGroup {
     }
 
     private void onFingerReleased() {
+        forceLayout = true;
+        requestLayout();
+
         int[] finalLocation = correctLocation();
         startScroll(finalLocation[0], finalLocation[1], SCROLL_DURATION);
     }
@@ -524,19 +546,20 @@ public class FloatBall extends ViewGroup {
         @Override
         public void run() {
             final int currentX = mClipScroller.getCurrX();
-            Log("ClipRunnable run currentX=" + currentX + ";finalX=" + mClipScroller.getFinalX());
-            if (mClipScroller.computeScrollOffset() && menu != null) {
-                menu.setOffset(currentX);
-                if (currentX == mClipScroller.getFinalX() && currentX == 0) {
-                    menu.setVisibility(GONE);
+            if (menu != null && menu.getVisibility() == VISIBLE) {
+                if (mClipScroller.computeScrollOffset()) {
+                    menu.setOffset(currentX);
+                    if (currentX == mClipScroller.getFinalX() && currentX == 0) {
+                        menu.setVisibility(GONE);
+                    }
+                    post(this);
+                } else {
+                    menu.setOffset(currentX);
+                    if (currentX == mClipScroller.getFinalX() && currentX == 0) {
+                        menu.setVisibility(GONE);
+                    }
+                    removeCallbacks(this);
                 }
-                post(this);
-            } else if (menu != null) {
-                menu.setOffset(currentX);
-                if (currentX == mClipScroller.getFinalX() && currentX == 0) {
-                    menu.setVisibility(GONE);
-                }
-                removeCallbacks(this);
             }
         }
     }
@@ -570,7 +593,6 @@ public class FloatBall extends ViewGroup {
             } else {
                 removeCallbacks(this);
                 fadeOutFloatBall();
-                requestLayout();
             }
         }
     };

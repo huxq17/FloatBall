@@ -51,7 +51,7 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "福利");
-                mFloatBall.hideMenu();
+                hideMenu();
             }
         });
         tvLeftGift.setTextSize(14);
@@ -75,7 +75,7 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "我的");
-                mFloatBall.hideMenu();
+                hideMenu();
             }
         });
         tvLeftCenter.setTextSize(14);
@@ -101,7 +101,7 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "我的");
-                mFloatBall.hideMenu();
+                hideMenu();
             }
         });
         tvRightCenter.setTextSize(14);
@@ -126,13 +126,18 @@ public class FloatBallMenu implements IMenu {
             @Override
             public void onClick(View v) {
                 toast(context, "福利");
-                mFloatBall.hideMenu();
+                hideMenu();
             }
         });
         tvRightGift.setTextSize(14);
         tvRightGift.setGravity(Gravity.CENTER);
         tvRightGift.setTextColor(Color.parseColor("#333333"));
         parent.addView(tvRightGift, childLayoutParams);
+    }
+
+    private void hideMenu() {
+        mFloatBall.hideMenuImmediately();
+//        mFloatBall.hideMenu();
     }
 
     @Override
