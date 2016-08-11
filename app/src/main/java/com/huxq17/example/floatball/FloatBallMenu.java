@@ -136,8 +136,8 @@ public class FloatBallMenu implements IMenu {
     }
 
     private void hideMenu() {
-        mFloatBall.hideMenuImmediately();
-//        mFloatBall.hideMenu();
+//        mFloatBall.hideMenuImmediately();
+        mFloatBall.hideMenu();
     }
 
     @Override

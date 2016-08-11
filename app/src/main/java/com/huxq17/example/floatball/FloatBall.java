@@ -217,9 +217,11 @@ public class FloatBall extends ViewGroup {
 
     public void hideFloatBall() {
         isMenuShowing = false;
-        stopClipRunner();
+//        stopClipRunner();
         menu.setOffset(0);
         setVisibility(GONE);
+        removeCallbacks(mclipRunnable);
+        mClipScroller.setFinalX(0);
     }
 
     public void hideMenu() {
