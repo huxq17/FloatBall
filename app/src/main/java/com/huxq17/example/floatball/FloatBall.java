@@ -129,6 +129,12 @@ public class FloatBall extends ViewGroup {
         }
     }
 
+    private OnClickListener mClickListener;
+
+    public void setOnClickListener(OnClickListener listener) {
+        mClickListener = listener;
+    }
+
     public FloatBall(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, null, null, null, 0, 0);
@@ -166,12 +172,16 @@ public class FloatBall extends ViewGroup {
         ivFloatBall.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mClickListener != null) {
+                    mClickListener.onClick(v);
+                }
                 showMenu(!isMenuShowing);
             }
         });
         this.addView(ivFloatBall, layoutParams);
         leftMenuWidth = menuWidth - floatBallWidth / 2;
     }
+
 
     private void addMenu(Context context) {
         if (menuOperator != null) {
@@ -629,7 +639,7 @@ public class FloatBall extends ViewGroup {
         } else {
             mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
         }
-        mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+        mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
         mLayoutParams.format = PixelFormat.RGBA_8888;
         mLayoutParams.gravity = mLayoutGravity;
         mLayoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;

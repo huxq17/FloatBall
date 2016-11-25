@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private FloatBall mFloatBall;
@@ -31,7 +32,14 @@ public class MainActivity extends Activity {
         //一张图片两种状态的两种写法
 //        mFloatBall = new FloatBall.Builder(getApplicationContext()).menu(menu).doubleIcon(doubleIcon).icon(singleIcon).build();
         mFloatBall = new FloatBall.Builder(getApplicationContext()).menu(menu).icon(singleIcon).build();
-
+        //没有菜单的写法
+//        mFloatBall = new FloatBall.Builder(getApplicationContext()).icon(singleIcon).build();
+        mFloatBall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "click", Toast.LENGTH_SHORT).show();
+            }
+        });
 //        mFloatBall = (FloatBall) LayoutInflater.from(this).inflate(R.layout.float_layout, null);
         mFloatBall.setLayoutGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
     }
