@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#cecece"
+    android:background="@android:color/holo_green_dark"
     tools:context="com.huxq17.example.floatball.MainActivity">
-
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="changeOrientation"
-        android:text="横竖屏切换" />
+        android:onClick="showFloatBall"
+        android:layout_centerInParent="true"
+        android:text="显示悬浮球" />
 </RelativeLayout>
