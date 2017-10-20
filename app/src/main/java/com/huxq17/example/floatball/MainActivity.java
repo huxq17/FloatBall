@@ -19,6 +19,7 @@ import com.huxq17.example.floatball.utils.DensityUtil;
 public class MainActivity extends Activity {
     private FloatBallManager mFloatBallManager;
     private FloatPermissionManager mFloatPermissionManager;
+    private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeCycleListener();
     private int resumed;
 
     public void showFloatBall(View v) {
@@ -40,7 +41,7 @@ public class MainActivity extends Activity {
             });
         }
         //如果想做成应用内悬浮球，可以添加以下代码。
-        addActivityLifeCycleListener(getApplication());
+        getApplication().registerActivityLifecycleCallbacks(mActivityLifeCycleListener);
     }
 
     private void init() {
@@ -100,43 +101,41 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void addActivityLifeCycleListener(Application app) {
+    public class ActivityLifeCycleListener implements Application.ActivityLifecycleCallbacks {
 
-        app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
-            @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-            }
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        }
 
-            @Override
-            public void onActivityStarted(Activity activity) {
-            }
+        @Override
+        public void onActivityStarted(Activity activity) {
+        }
 
-            @Override
-            public void onActivityResumed(Activity activity) {
-                ++resumed;
-                setFloatballVisible(true);
-            }
+        @Override
+        public void onActivityResumed(Activity activity) {
+            ++resumed;
+            setFloatballVisible(true);
+        }
 
-            @Override
-            public void onActivityPaused(Activity activity) {
-                --resumed;
-                if (!isApplicationInForeground()) {
-                    setFloatballVisible(false);
-                }
+        @Override
+        public void onActivityPaused(Activity activity) {
+            --resumed;
+            if (!isApplicationInForeground()) {
+                setFloatballVisible(false);
             }
+        }
 
-            @Override
-            public void onActivityStopped(Activity activity) {
-            }
+        @Override
+        public void onActivityStopped(Activity activity) {
+        }
 
-            @Override
-            public void onActivityDestroyed(Activity activity) {
-            }
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+        }
 
-            @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-            }
-        });
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        }
     }
 
     private void toast(String msg) {
@@ -185,6 +184,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        getApplication().unregisterActivityLifecycleCallbacks(mActivityLifeCycleListener);
     }
 
 }
