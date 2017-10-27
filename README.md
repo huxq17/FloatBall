@@ -2,9 +2,8 @@
 ##可拖动，带菜单，能自动吸边和半隐藏的悬浮球。
 
 - 效果图
-|松开加载更多的Recyclerview|带Banner的Recyclerview|
 
- <img src="gif/gif1.gif" width="280" height="475" />|<img src="gif/gif1.gif" width="280" height="475" />
+ <img src="gifs/gif1.gif" width="280" height="475" />|<img src="gifs/gif1.gif" width="280" height="475" />
 
 
 
