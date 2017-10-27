@@ -33,15 +33,7 @@ public class FloatBallManager {
     private List<MenuItem> menuItems = new ArrayList<>();
 
     public FloatBallManager(Context application, FloatBallCfg ballCfg) {
-        mContext = application.getApplicationContext();
-        int statusbarId = application.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (statusbarId > 0) {
-            mStatusBarHeight = application.getResources().getDimensionPixelSize(statusbarId);
-        }
-        mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        computeScreenSize();
-        floatBall = new FloatBall(mContext, this, ballCfg);
-        floatMenu = new FloatMenu(mContext, this, null);
+        this(application, ballCfg, null);
     }
 
     public FloatBallManager(Context application, FloatBallCfg ballCfg, FloatMenuCfg menuCfg) {
@@ -143,7 +135,7 @@ public class FloatBallManager {
         }
     }
 
-    public void remove() {
+    public void hide() {
         if (!isShowing) return;
         isShowing = false;
         floatBall.detachFromWindow(mWindowManager);

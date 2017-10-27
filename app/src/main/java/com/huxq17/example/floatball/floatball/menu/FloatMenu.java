@@ -169,6 +169,7 @@ public class FloatMenu extends FrameLayout {
     }
 
     public void addItem(final MenuItem menuItem) {
+        if (mConfig == null) return;
         ImageView imageview = new ImageView(getContext());
         imageview.setBackgroundDrawable(menuItem.mDrawable);
         mMenuLayout.addView(imageview);
