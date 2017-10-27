@@ -169,6 +169,10 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
   mFloatballManager.hide();
 ```
 
+- 感谢
+
+1. [悬浮球权限适配相关的库](https://github.com/zhaozepeng/FloatWindowPermission)
+
 
 
 
