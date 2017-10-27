@@ -58,7 +58,7 @@ FloatBallManager是提供操控悬浮球的类，可以通过它来添加菜单�
                     .addMenuItem(walletItem)
                     .addMenuItem(settingItem)
                     .buildMenu();
-    }
+        }
         ```
 
     - 不显示菜单
