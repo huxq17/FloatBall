@@ -3,7 +3,7 @@
 
 - 效果图
 
- <img src="gifs/gif1.gif" width="280" height="475" />|<img src="gifs/gif1.gif" width="280" height="475" />
+ <img src="gifs/gif1.gif" width="280" height="475" />|<img src="gifs/gif2.gif" width="280" height="475" />
 
 
 
