@@ -11,11 +11,15 @@ import com.huxq17.example.floatball.utils.Util;
 public class FloatBallUtil {
     public static WindowManager.LayoutParams getLayoutParams() {
         WindowManager.LayoutParams mLayoutParams = new WindowManager.LayoutParams();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !Util.isOnePlus()) {
-            //一加5用TYPE_TOAST时，在下拉状态栏后，过个几秒悬浮球会消失，所以加个是不是一加手机的判断。
-            mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
-        } else {
+        final int sdkInt = Build.VERSION.SDK_INT;
+        if (sdkInt < Build.VERSION_CODES.KITKAT) {
             mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        } else if (sdkInt < Build.VERSION_CODES.N_MR1) {
+            mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        } else if (sdkInt < Build.VERSION_CODES.O) {
+            mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        } else {//8.0以后
+            mLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         }
         mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
                 | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;

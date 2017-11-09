@@ -22,6 +22,7 @@ import com.huxq17.example.floatball.permission.rom.MeizuUtils;
 import com.huxq17.example.floatball.permission.rom.MiuiUtils;
 import com.huxq17.example.floatball.permission.rom.QikuUtils;
 import com.huxq17.example.floatball.permission.rom.RomUtils;
+import com.huxq17.example.floatball.utils.LogUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -208,6 +209,7 @@ public class FloatPermissionManager {
     }
 
     private void showConfirmDialog(Context context, String message, final OnConfirmResult result) {
+        LogUtils.e("testfloat showConfirmDialog");
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
@@ -272,7 +274,7 @@ public class FloatPermissionManager {
     }
 
 
-    private int dp2px(Context context, float dp){
+    private int dp2px(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
