@@ -168,6 +168,9 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
 ```
 ### 更新日志：<br/>
 
+    2017-11-16：
+    1.添加按下返回键关闭悬浮菜单的功能。
+
     2017-11-9：
     1.解决android 7.1.1以后悬浮球显示几秒后自动隐藏的问题。
 

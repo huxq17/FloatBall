@@ -19,6 +19,7 @@ package com.huxq17.example.floatball.floatball.menu;
 import android.content.Context;
 import android.os.Build;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,8 +45,9 @@ public class FloatMenu extends FrameLayout {
     private boolean isAdded = false;
     private int mBallSize;
     private FloatMenuCfg mConfig;
+    private boolean mListenBackEvent = true;
 
-    public FloatMenu(Context context, FloatBallManager floatBallManager, FloatMenuCfg config) {
+    public FloatMenu(Context context, final FloatBallManager floatBallManager, FloatMenuCfg config) {
         super(context);
         this.floatBallManager = floatBallManager;
         if (config == null) return;
@@ -127,7 +129,7 @@ public class FloatMenu extends FrameLayout {
     }
 
     private void init(Context context) {
-        mLayoutParams = FloatBallUtil.getLayoutParams();
+        mLayoutParams = FloatBallUtil.getLayoutParams(mListenBackEvent);
         mLayoutParams.height = mSize;
         mLayoutParams.width = mSize;
         addMenuLayout(context);
@@ -138,6 +140,22 @@ public class FloatMenu extends FrameLayout {
                 closeMenu();
             }
         });
+        if (mListenBackEvent) {
+            setOnKeyListener(new OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    int action = event.getAction();
+                    if (action == KeyEvent.ACTION_DOWN) {
+                        if (keyCode == KeyEvent.KEYCODE_BACK) {
+                            FloatMenu.this.floatBallManager.closeMenu();
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+            setFocusableInTouchMode(true);
+        }
     }
 
     public void closeMenu() {
