@@ -169,6 +169,10 @@ public class FloatBall extends FrameLayout implements ICarrier {
             if (isClick) {
                 onClick();
             } else {
+                // 用于再次计算菜单应该有的宽高
+                floatBallManager.floatballX = mLayoutParams.x;
+                floatBallManager.floatballY = mLayoutParams.y;
+                floatBallManager.moveOver();    // 回调到外面让manager重新布局菜单
                 moveToEdge(true, false);
             }
         }

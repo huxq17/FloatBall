@@ -139,7 +139,6 @@ public class FloatBallManager {
         if (!isShowing) return;
         isShowing = false;
         floatBall.detachFromWindow(mWindowManager);
-        floatMenu.detachFromWindow(mWindowManager);
     }
 
     public void onConfigurationChanged(Configuration newConfig) {
@@ -153,6 +152,14 @@ public class FloatBallManager {
 
     public void setOnFloatBallClickListener(OnFloatBallClickListener listener) {
         mFloatballClickListener = listener;
+    }
+
+    /**
+     * 移动完毕，刷新菜单状态。move over，refresh menu state.
+     */
+    public void moveOver() {
+        // TODO 刷新position 然后刷新宽高
+        floatMenu.refreshState();
     }
 
     public interface OnFloatBallClickListener {

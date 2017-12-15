@@ -106,6 +106,19 @@ public class FloatMenu extends FrameLayout {
         }
     }
 
+    /**
+     * 刷新菜单状态（重新计算位置 大小）
+     */
+    public void refreshState() {
+        mBallSize = floatBallManager.getBallSize();
+        mLayoutParams.x = floatBallManager.floatballX;
+        mLayoutParams.y = floatBallManager.floatballY - mSize / 2;
+        mPosition = computeMenuLayout(mLayoutParams);
+        refreshPathMenu(mPosition);
+        mMenuLayout.refreshState(mPosition, mDuration);
+        mMenuLayout.measure(-2147483288, -2147483288);  // 模拟系统重新计算宽高 -2147483288是根据正常情况下系统的传值抓取的（其实是也没有使用这两个值，无所谓的）
+    }
+
     public void detachFromWindow(WindowManager windowManager) {
         if (isAdded) {
             toggle(0);
