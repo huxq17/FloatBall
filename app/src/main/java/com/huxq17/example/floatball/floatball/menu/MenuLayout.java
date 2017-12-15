@@ -123,10 +123,8 @@ public class MenuLayout extends ViewGroup implements ICarrier {
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        System.out.println("改变 宽高：mToDegrees:" + mToDegrees + "  mFromDegrees:" + mFromDegrees + "  mChildPadding:" + mChildPadding + "   MIN_RADIUS:" + MIN_RADIUS);
         mRadius = computeRadius(Math.abs(mToDegrees - mFromDegrees), getChildCount(),
                 mChildSize, mChildPadding, MIN_RADIUS);
-        System.out.println("改变 宽高：mRadius:" + mRadius + "  mChildSize:" + mChildSize + "  widthMeasureSpec:" + widthMeasureSpec + "   heightMeasureSpec:" + heightMeasureSpec);
         int layoutPadding = 10;
         int size = mRadius * 2 + mChildSize + mChildPadding + layoutPadding * 2;
         setMeasuredDimension(size, size);
