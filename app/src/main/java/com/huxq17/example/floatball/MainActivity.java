@@ -153,6 +153,8 @@ public class MainActivity extends Activity {
         };
         mFloatballManager.addMenuItem(personItem)
                 .addMenuItem(walletItem)
+                .addMenuItem(personItem)
+                .addMenuItem(walletItem)
                 .addMenuItem(settingItem)
                 .buildMenu();
     }

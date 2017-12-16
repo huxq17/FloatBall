@@ -95,12 +95,11 @@ public class FloatMenu extends FrameLayout {
     public void attachToWindow(WindowManager windowManager) {
         if (!isAdded) {
             mBallSize = floatBallManager.getBallSize();
-            toggle(mDuration);
             mLayoutParams.x = floatBallManager.floatballX;
             mLayoutParams.y = floatBallManager.floatballY - mSize / 2;
             mPosition = computeMenuLayout(mLayoutParams);
-            mMenuLayout.setVisibility(VISIBLE);
             refreshPathMenu(mPosition);
+            toggle(mDuration);
             windowManager.addView(this, mLayoutParams);
             isAdded = true;
         }

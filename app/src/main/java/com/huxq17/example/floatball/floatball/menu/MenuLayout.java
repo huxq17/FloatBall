@@ -30,43 +30,46 @@ public class MenuLayout extends ViewGroup implements ICarrier {
     private ScrollRunner mRunner;
 
     public void computeCenterXY(int position) {
+        final int size = getLayoutSize();
+        int width = size;
+        int height = size;
         switch (position) {
             case FloatMenu.LEFT_TOP://左上
-                centerX = getWidth() / 2 - getRadiusAndPadding();
-                centerY = getHeight() / 2 - getRadiusAndPadding();
+                centerX = width / 2 - getRadiusAndPadding();
+                centerY = height / 2 - getRadiusAndPadding();
                 break;
             case FloatMenu.LEFT_CENTER://左中
-                centerX = getWidth() / 2 - getRadiusAndPadding();
-                centerY = getHeight() / 2;
+                centerX = width / 2 - getRadiusAndPadding();
+                centerY = height / 2;
                 break;
             case FloatMenu.LEFT_BOTTOM://左下
-                centerX = getWidth() / 2 - getRadiusAndPadding();
-                centerY = getHeight() / 2 + getRadiusAndPadding();
+                centerX = width / 2 - getRadiusAndPadding();
+                centerY = height / 2 + getRadiusAndPadding();
                 break;
             case FloatMenu.CENTER_TOP://上中
-                centerX = getWidth() / 2;
-                centerY = getHeight() / 2 - getRadiusAndPadding();
+                centerX = width / 2;
+                centerY = height / 2 - getRadiusAndPadding();
                 break;
             case FloatMenu.CENTER_BOTTOM://下中
-                centerX = getWidth() / 2;
-                centerY = getHeight() / 2 + getRadiusAndPadding();
+                centerX = width / 2;
+                centerY = height / 2 + getRadiusAndPadding();
                 break;
             case FloatMenu.RIGHT_TOP://右上
-                centerX = getWidth() / 2 + getRadiusAndPadding();
-                centerY = getHeight() / 2 - getRadiusAndPadding();
+                centerX = width / 2 + getRadiusAndPadding();
+                centerY = height / 2 - getRadiusAndPadding();
                 break;
             case FloatMenu.RIGHT_CENTER://右中
-                centerX = getWidth() / 2 + getRadiusAndPadding();
-                centerY = getHeight() / 2;
+                centerX = width / 2 + getRadiusAndPadding();
+                centerY = height / 2;
                 break;
             case FloatMenu.RIGHT_BOTTOM://右下
-                centerX = getWidth() / 2 + getRadiusAndPadding();
-                centerY = getHeight() / 2 + getRadiusAndPadding();
+                centerX = width / 2 + getRadiusAndPadding();
+                centerY = height / 2 + getRadiusAndPadding();
                 break;
 
             case FloatMenu.CENTER:
-                centerX = getWidth() / 2;
-                centerY = getHeight() / 2;
+                centerX = width / 2;
+                centerY = width / 2;
                 break;
         }
     }
@@ -118,16 +121,20 @@ public class MenuLayout extends ViewGroup implements ICarrier {
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        mRadius = computeRadius(Math.abs(mToDegrees - mFromDegrees), getChildCount(),
-                mChildSize, mChildPadding, MIN_RADIUS);
-        int layoutPadding = 10;
-        int size = mRadius * 2 + mChildSize + mChildPadding + layoutPadding * 2;
+        int size = getLayoutSize();
         setMeasuredDimension(size, size);
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {
             getChildAt(i).measure(MeasureSpec.makeMeasureSpec(mChildSize, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(mChildSize, MeasureSpec.EXACTLY));
         }
+    }
+
+    private int getLayoutSize() {
+        mRadius = computeRadius(Math.abs(mToDegrees - mFromDegrees), getChildCount(),
+                mChildSize, mChildPadding, MIN_RADIUS);
+        int layoutPadding = 10;
+        return mRadius * 2 + mChildSize + mChildPadding + layoutPadding * 2;
     }
 
     /**
@@ -196,7 +203,8 @@ public class MenuLayout extends ViewGroup implements ICarrier {
         this.position = position;
         mExpanded = !mExpanded;
         isMoving = true;
-        computeCenterXY(position);
+        mRadius = computeRadius(Math.abs(mToDegrees - mFromDegrees), getChildCount(),
+                mChildSize, mChildPadding, MIN_RADIUS);
         final int start = mExpanded ? 0 : mRadius;
         final int radius = mExpanded ? mRadius : -mRadius;
         mRunner.start(start, 0, radius, 0, duration);

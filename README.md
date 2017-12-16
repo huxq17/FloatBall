@@ -168,6 +168,9 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
 ```
 ### 更新日志：<br/>
 
+    2017-12-16：
+    1.解决菜单item个数大于3时，菜单item位置会错乱的问题，详见 https://github.com/huxq17/FloatBall/pull/7。
+
     2017-11-16：
     1.添加按下返回键关闭悬浮菜单的功能。
 
