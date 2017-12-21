@@ -7,7 +7,7 @@ public class FloatBallCfg {
     public int mSize;
     //第一次是否显示在左边
     public boolean mLeft;
-    //第一次显示的y坐标偏移量，左上角是远点。
+    //第一次显示的y坐标偏移量，左上角是原点。
     public int mOffsetY;
 
     /**
@@ -20,7 +20,7 @@ public class FloatBallCfg {
     }
 
     /**
-     * 第一次显示的y坐标偏移量，屏幕左上角是远点。
+     * 第一次显示的y坐标偏移量，屏幕左上角是原点。
      * @param offsetY
      */
     public void setOffsetY(int offsetY) {

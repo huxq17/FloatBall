@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
         FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon);
         //可以设置悬浮球的初始位置是否在左边
         ballCfg.setLeft(false);
-        //设置悬浮球初始位置y坐标偏移量，屏幕左上角是远点
+        //设置悬浮球初始位置y坐标偏移量，屏幕左上角是原点
         ballCfg.setOffsetY(200);
         if (showMenu) {
             //2 需要显示悬浮菜单
