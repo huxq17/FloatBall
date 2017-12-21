@@ -50,6 +50,10 @@ public class MainActivity extends Activity {
         int ballSize = DensityUtil.dip2px(this, 45);
         Drawable ballIcon = BackGroudSeletor.getdrawble("ic_floatball", this);
         FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon);
+        //可以设置悬浮球的初始位置是否在左边
+        ballCfg.setLeft(false);
+        //设置悬浮球初始位置y坐标偏移量，屏幕左上角是远点
+        ballCfg.setOffsetY(200);
         if (showMenu) {
             //2 需要显示悬浮菜单
             //2.1 初始化悬浮菜单配置，有菜单item的大小和菜单item的个数

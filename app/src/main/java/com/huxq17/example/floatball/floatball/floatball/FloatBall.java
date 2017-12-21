@@ -98,10 +98,12 @@ public class FloatBall extends FrameLayout implements ICarrier {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int height = getMeasuredHeight();
+        int width = getMeasuredWidth();
         if (height != 0 && isFirst) {
             isFirst = false;
-            int deltaY = floatBallManager.mScreenHeight / 2 - height;
-            onMove(0, deltaY);
+            int x = mConfig.mLeft ? 0 : floatBallManager.mScreenWidth - width;
+            int deltaY = mConfig.mOffsetY >= 0 ? mConfig.mOffsetY : floatBallManager.mScreenHeight / 2 - height;
+            onMove(x, deltaY);
         }
     }
 
