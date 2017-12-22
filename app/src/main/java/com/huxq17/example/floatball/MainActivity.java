@@ -49,11 +49,12 @@ public class MainActivity extends Activity {
         //1 初始化悬浮球配置，定义好悬浮球大小和icon的drawable
         int ballSize = DensityUtil.dip2px(this, 45);
         Drawable ballIcon = BackGroudSeletor.getdrawble("ic_floatball", this);
-        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon);
+        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon,false,0);
+//        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon);
         //可以设置悬浮球的初始位置是否在左边
-        ballCfg.setLeft(false);
+//        ballCfg.setLeft(false);
         //设置悬浮球初始位置y坐标偏移量，屏幕左上角是原点
-        ballCfg.setOffsetY(200);
+//        ballCfg.setOffsetY(200);
         if (showMenu) {
             //2 需要显示悬浮菜单
             //2.1 初始化悬浮菜单配置，有菜单item的大小和菜单item的个数

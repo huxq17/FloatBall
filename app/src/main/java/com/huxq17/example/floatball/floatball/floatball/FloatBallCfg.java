@@ -8,7 +8,7 @@ public class FloatBallCfg {
     //第一次是否显示在左边
     public boolean mLeft;
     //第一次显示的y坐标偏移量，左上角是原点。
-    public int mOffsetY;
+    public int mOffsetY = -1;
 
     /**
      * 第一次是否显示在左边
@@ -21,6 +21,7 @@ public class FloatBallCfg {
 
     /**
      * 第一次显示的y坐标偏移量，屏幕左上角是原点。
+     *
      * @param offsetY
      */
     public void setOffsetY(int offsetY) {
@@ -28,7 +29,13 @@ public class FloatBallCfg {
     }
 
     public FloatBallCfg(int size, Drawable icon) {
+        this(size, icon, true, -1);
+    }
+
+    public FloatBallCfg(int size, Drawable icon, boolean isLeft, int offsetY) {
         mSize = size;
         mIcon = icon;
+        mLeft = isLeft;
+        mOffsetY = offsetY;
     }
 }
