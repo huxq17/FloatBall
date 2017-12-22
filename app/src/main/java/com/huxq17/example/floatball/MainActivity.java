@@ -49,7 +49,7 @@ public class MainActivity extends Activity {
         //1 初始化悬浮球配置，定义好悬浮球大小和icon的drawable
         int ballSize = DensityUtil.dip2px(this, 45);
         Drawable ballIcon = BackGroudSeletor.getdrawble("ic_floatball", this);
-        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon,false,0);
+        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon,false,-1);
 //        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon);
         //可以设置悬浮球的初始位置是否在左边
 //        ballCfg.setLeft(false);
