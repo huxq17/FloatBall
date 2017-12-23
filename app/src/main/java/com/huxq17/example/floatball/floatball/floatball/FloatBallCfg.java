@@ -1,41 +1,60 @@
 package com.huxq17.example.floatball.floatball.floatball;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 public class FloatBallCfg {
     public Drawable mIcon;
     public int mSize;
-    //第一次是否显示在左边
-    public boolean mLeft;
+    /**
+     * 标记悬浮球所处于屏幕中的位置
+     *
+     * @see Gravity#LEFT_TOP
+     * @see Gravity#LEFT_CENTER
+     * @see Gravity#LEFT_BOTTOM
+     * @see Gravity#RIGHT_TOP
+     * @see Gravity#RIGHT_CENTER
+     * @see Gravity#RIGHT_BOTTOM
+     */
+    public Gravity mGravity;
     //第一次显示的y坐标偏移量，左上角是原点。
-    public int mOffsetY = -1;
-
-    /**
-     * 第一次是否显示在左边
-     *
-     * @param isLeft true显示在左边，false则在右边
-     */
-    public void setLeft(boolean isLeft) {
-        mLeft = isLeft;
-    }
-
-    /**
-     * 第一次显示的y坐标偏移量，屏幕左上角是原点。
-     *
-     * @param offsetY
-     */
-    public void setOffsetY(int offsetY) {
-        mOffsetY = offsetY;
-    }
+    public int mOffsetY = 0;
 
     public FloatBallCfg(int size, Drawable icon) {
-        this(size, icon, true, -1);
+        this(size, icon, Gravity.LEFT_TOP, 0);
     }
 
-    public FloatBallCfg(int size, Drawable icon, boolean isLeft, int offsetY) {
+    public FloatBallCfg(int size, Drawable icon, Gravity gravity) {
+        this(size, icon, gravity, 0);
+    }
+
+    public FloatBallCfg(int size, Drawable icon, Gravity gravity, int offsetY) {
         mSize = size;
         mIcon = icon;
-        mLeft = isLeft;
+        mGravity = gravity;
         mOffsetY = offsetY;
+    }
+
+    public void setGravity(Gravity gravity) {
+        mGravity = gravity;
+    }
+
+    public enum Gravity {
+        LEFT_TOP(android.view.Gravity.LEFT | android.view.Gravity.TOP),
+        LEFT_CENTER(android.view.Gravity.LEFT | android.view.Gravity.CENTER),
+        LEFT_BOTTOM(android.view.Gravity.LEFT | android.view.Gravity.BOTTOM),
+        RIGHT_TOP(android.view.Gravity.RIGHT | android.view.Gravity.TOP),
+        RIGHT_CENTER(android.view.Gravity.RIGHT | android.view.Gravity.CENTER),
+        RIGHT_BOTTOM(android.view.Gravity.RIGHT | android.view.Gravity.BOTTOM);
+
+        int mValue;
+
+        Gravity(int gravity) {
+            mValue = gravity;
+        }
+
+        public int getGravity() {
+            return mValue;
+        }
     }
 }

@@ -3,6 +3,8 @@ package com.huxq17.example.floatball.floatball.floatball;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import com.huxq17.example.floatball.floatball.runner.OnceRunnable;
 import com.huxq17.example.floatball.floatball.runner.ScrollRunner;
 import com.huxq17.example.floatball.utils.MotionVelocityUtil;
 import com.huxq17.example.floatball.utils.Util;
+
+import static android.R.attr.x;
 
 
 public class FloatBall extends FrameLayout implements ICarrier {
@@ -101,9 +105,29 @@ public class FloatBall extends FrameLayout implements ICarrier {
         int width = getMeasuredWidth();
         if (height != 0 && isFirst) {
             isFirst = false;
-            int x = mConfig.mLeft ? 0 : floatBallManager.mScreenWidth - width;
-            int deltaY = mConfig.mOffsetY >= 0 ? mConfig.mOffsetY : floatBallManager.mScreenHeight / 2 - height;
-            onMove(x, deltaY);
+            FloatBallCfg.Gravity cfgGravity = mConfig.mGravity;
+            int gravity = cfgGravity.getGravity();
+            int x;
+            int y;
+            int topLimit = 0;
+            int bottomLimit = floatBallManager.mScreenHeight - height;
+            if ((gravity & Gravity.LEFT) == Gravity.LEFT) {
+                x = 0;
+            } else {
+                x = floatBallManager.mScreenWidth - width;
+            }
+            if ((gravity & Gravity.TOP) == Gravity.TOP) {
+                y = topLimit;
+            } else if ((gravity & Gravity.BOTTOM) == Gravity.BOTTOM) {
+                y = floatBallManager.mScreenHeight - height;
+            } else {
+                y = floatBallManager.mScreenHeight / 2 - height;
+            }
+            y = mConfig.mOffsetY != 0 ? y + mConfig.mOffsetY : y;
+            if (y < 0) y = topLimit;
+            if (y > bottomLimit)
+                y = topLimit;
+            onMove(x, y);
         }
     }
 
