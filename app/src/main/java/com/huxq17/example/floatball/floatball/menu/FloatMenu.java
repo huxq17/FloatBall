@@ -185,6 +185,10 @@ public class FloatMenu extends FrameLayout {
         }
     }
 
+    public boolean isMoving() {
+        return mMenuLayout.isMoving();
+    }
+
     public void addItem(final MenuItem menuItem) {
         if (mConfig == null) return;
         ImageView imageview = new ImageView(getContext());
@@ -193,7 +197,8 @@ public class FloatMenu extends FrameLayout {
         imageview.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                menuItem.action();
+                if (!mMenuLayout.isMoving())
+                    menuItem.action();
             }
         });
     }

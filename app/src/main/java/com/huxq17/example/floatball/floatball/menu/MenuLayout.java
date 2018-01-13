@@ -210,6 +210,10 @@ public class MenuLayout extends ViewGroup implements ICarrier {
         mRunner.start(start, 0, radius, 0, duration);
     }
 
+    public boolean isMoving() {
+        return isMoving;
+    }
+
     @Override
     public void onMove(int lastX, int lastY, int curX, int curY) {
         layoutItem(curX);
