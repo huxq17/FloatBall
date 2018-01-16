@@ -3,7 +3,6 @@ package com.huxq17.example.floatball.floatball.floatball;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
@@ -19,8 +18,6 @@ import com.huxq17.example.floatball.floatball.runner.OnceRunnable;
 import com.huxq17.example.floatball.floatball.runner.ScrollRunner;
 import com.huxq17.example.floatball.utils.MotionVelocityUtil;
 import com.huxq17.example.floatball.utils.Util;
-
-import static android.R.attr.x;
 
 
 public class FloatBall extends FrameLayout implements ICarrier {
@@ -43,10 +40,11 @@ public class FloatBall extends FrameLayout implements ICarrier {
     private MotionVelocityUtil mVelocity;
     private boolean sleep = false;
     private FloatBallCfg mConfig;
+    private boolean mHideHalfLater = true;
     private OnceRunnable mSleepRunnable = new OnceRunnable() {
         @Override
         public void onRun() {
-            if (isAdded) {
+            if (mHideHalfLater && isAdded) {
                 sleep = true;
                 moveToEdge(false, sleep);
             }
@@ -106,6 +104,7 @@ public class FloatBall extends FrameLayout implements ICarrier {
         if (height != 0 && isFirst) {
             isFirst = false;
             FloatBallCfg.Gravity cfgGravity = mConfig.mGravity;
+            mHideHalfLater = mConfig.mHideHalfLater;
             int gravity = cfgGravity.getGravity();
             int x;
             int y;
@@ -293,7 +292,7 @@ public class FloatBall extends FrameLayout implements ICarrier {
     }
 
     public void postSleepRunnable() {
-        if (!sleep && isAdded) {
+        if (mHideHalfLater && !sleep && isAdded) {
             mSleepRunnable.postDelaySelf(this, 3000);
         }
     }

@@ -1,7 +1,6 @@
 package com.huxq17.example.floatball.floatball.floatball;
 
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 public class FloatBallCfg {
     public Drawable mIcon;
@@ -19,6 +18,7 @@ public class FloatBallCfg {
     public Gravity mGravity;
     //第一次显示的y坐标偏移量，左上角是原点。
     public int mOffsetY = 0;
+    public boolean mHideHalfLater = true;
 
     public FloatBallCfg(int size, Drawable icon) {
         this(size, icon, Gravity.LEFT_TOP, 0);
@@ -35,8 +35,27 @@ public class FloatBallCfg {
         mOffsetY = offsetY;
     }
 
+    public FloatBallCfg(int size, Drawable icon, Gravity gravity, boolean hideHalfLater) {
+        mSize = size;
+        mIcon = icon;
+        mGravity = gravity;
+        mHideHalfLater = hideHalfLater;
+    }
+
+    public FloatBallCfg(int size, Drawable icon, Gravity gravity, int offsetY, boolean hideHalfLater) {
+        mSize = size;
+        mIcon = icon;
+        mGravity = gravity;
+        mOffsetY = offsetY;
+        mHideHalfLater = hideHalfLater;
+    }
+
     public void setGravity(Gravity gravity) {
         mGravity = gravity;
+    }
+
+    public void setHideHalfLater(boolean hideHalfLater) {
+        mHideHalfLater = hideHalfLater;
     }
 
     public enum Gravity {
