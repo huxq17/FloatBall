@@ -168,6 +168,9 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
 ```
 ### 更新日志：<br/>
 
+    2018-1-16：
+    1.添加对是否半隐藏悬浮球的设置。
+
     2018-1-13：
     1.解决快速点击悬浮球不断的打开和关闭菜单，会高几率的点中菜单的问题，详见 https://github.com/huxq17/FloatBall/issues/10。
 
