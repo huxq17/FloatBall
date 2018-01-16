@@ -12,6 +12,10 @@
  int ballSize = DensityUtil.dip2px(this, 45);
  Drawable ballIcon = BackGroudSeletor.getdrawble("ic_floatball", this);
  FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon);
+ //设置悬浮球的位置
+ //FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon,FloatBallCfg.Gravity.LEFT_CENTER);
+ //设置悬浮球不半隐藏
+ //ballCfg.setHideHalfLater(false);
 ```
 ### 生成悬浮球
 FloatBallManager是提供操控悬浮球的类，可以通过它来添加菜单，添加点击事件，显示和隐藏悬浮球
