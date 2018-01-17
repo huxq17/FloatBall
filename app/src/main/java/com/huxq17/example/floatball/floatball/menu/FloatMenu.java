@@ -118,7 +118,11 @@ public class FloatMenu extends FrameLayout {
         if (isAdded) {
             toggle(0);
             mMenuLayout.setVisibility(GONE);
-            windowManager.removeView(this);
+            if (getContext() instanceof Activity) {
+                windowManager.removeViewImmediate(this);
+            }else{
+                windowManager.removeView(this);
+            }
             isAdded = false;
         }
     }

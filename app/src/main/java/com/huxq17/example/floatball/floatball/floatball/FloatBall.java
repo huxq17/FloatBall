@@ -17,7 +17,6 @@ import com.huxq17.example.floatball.floatball.FloatBallUtil;
 import com.huxq17.example.floatball.floatball.runner.ICarrier;
 import com.huxq17.example.floatball.floatball.runner.OnceRunnable;
 import com.huxq17.example.floatball.floatball.runner.ScrollRunner;
-import com.huxq17.example.floatball.utils.LogUtils;
 import com.huxq17.example.floatball.utils.MotionVelocityUtil;
 import com.huxq17.example.floatball.utils.Util;
 
@@ -103,7 +102,11 @@ public class FloatBall extends FrameLayout implements ICarrier {
         this.windowManager = null;
         if (isAdded) {
             removeSleepRunnable();
-            windowManager.removeView(this);
+            if (getContext() instanceof Activity) {
+                windowManager.removeViewImmediate(this);
+            }else{
+                windowManager.removeView(this);
+            }
             isAdded = false;
             sleep = false;
         }
@@ -114,7 +117,6 @@ public class FloatBall extends FrameLayout implements ICarrier {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int height = getMeasuredHeight();
         int width = getMeasuredWidth();
-        LogUtils.e("onMeasure sleep=" + sleep + ";layoutchanged=" + mLayoutChanged);
 
         if (mLayoutChanged) {
             int curX = mLayoutParams.x;
@@ -171,7 +173,6 @@ public class FloatBall extends FrameLayout implements ICarrier {
     }
 
     public void onLayoutChange() {
-        LogUtils.e("onLayoutChange");
         mLayoutChanged = true;
         requestLayout();
     }

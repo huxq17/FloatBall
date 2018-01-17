@@ -25,7 +25,7 @@ public class StatusBarView extends View {
         mContext = context;
         mFloatBallManager = floatBallManager;
         Activity activity = null;
-        if(mContext instanceof Activity){
+        if (mContext instanceof Activity) {
             activity = (Activity) mContext;
         }
         mLayoutParams = FloatBallUtil.getLayoutParams(activity);
@@ -36,9 +36,13 @@ public class StatusBarView extends View {
         wm.addView(this, mLayoutParams);
     }
 
-    public void detachFromWindow(WindowManager wm) {
+    public void detachFromWindow(WindowManager windowManager) {
         removeOnLayoutChangeListener(layoutChangeListener);
-        wm.removeView(this);
+        if (getContext() instanceof Activity) {
+            windowManager.removeViewImmediate(this);
+        } else {
+            windowManager.removeView(this);
+        }
     }
 
     public int getStatusBarHeight() {

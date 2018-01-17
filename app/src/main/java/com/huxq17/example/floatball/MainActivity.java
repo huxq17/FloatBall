@@ -56,6 +56,18 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mFloatballManager.show();
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mFloatballManager.hide();
+    }
+
     private boolean isfull = false;
 
     //全屏设置和退出全屏
