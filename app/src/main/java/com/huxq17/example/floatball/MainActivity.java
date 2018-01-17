@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.huxq17.example.floatball.floatball.FloatBallManager;
@@ -21,17 +22,24 @@ public class MainActivity extends Activity {
     private FloatPermissionManager mFloatPermissionManager;
     private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeCycleListener();
     private int resumed;
+    private boolean inSingleActivity = true;
 
     public void showFloatBall(View v) {
         mFloatballManager.show();
+//        changescreen(v);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         boolean showMenu = true;//换成false试试
-        init(showMenu);
+        if (inSingleActivity) {
+            initSinglePageFloatball(showMenu);
+        } else {
+            init(showMenu);
+        }
         //5 如果没有添加菜单，可以设置悬浮球点击事件
         if (mFloatballManager.getMenuItemSize() == 0) {
             mFloatballManager.setOnFloatBallClickListener(new FloatBallManager.OnFloatBallClickListener() {
@@ -42,7 +50,62 @@ public class MainActivity extends Activity {
             });
         }
         //6 如果想做成应用内悬浮球，可以添加以下代码。
-        getApplication().registerActivityLifecycleCallbacks(mActivityLifeCycleListener);
+        if (!inSingleActivity) {
+            getApplication().registerActivityLifecycleCallbacks(mActivityLifeCycleListener);
+        }
+
+    }
+
+    private boolean isfull = false;
+
+    //全屏设置和退出全屏
+    private void setFullScreen() {
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        isfull = true;
+    }
+
+    private void quitFullScreen() {
+        final WindowManager.LayoutParams attrs = getWindow().getAttributes();
+        attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setAttributes(attrs);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        isfull = false;
+    }
+
+    public void changescreen(View view) {
+        if (isfull == true) {
+            quitFullScreen();
+        } else {
+            setFullScreen();
+        }
+    }
+
+    private void initSinglePageFloatball(boolean showMenu) {
+        //1 初始化悬浮球配置，定义好悬浮球大小和icon的drawable
+        int ballSize = DensityUtil.dip2px(this, 45);
+        Drawable ballIcon = BackGroudSeletor.getdrawble("ic_floatball", this);
+        //可以尝试使用以下几种不同的config。
+//        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon);
+//        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.LEFT_CENTER,false);
+//        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.LEFT_BOTTOM, -100);
+//        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_TOP, 100);
+        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_BOTTOM);
+        //设置悬浮球不半隐藏
+//        ballCfg.setHideHalfLater(false);
+        if (showMenu) {
+            //2 需要显示悬浮菜单
+            //2.1 初始化悬浮菜单配置，有菜单item的大小和菜单item的个数
+            int menuSize = DensityUtil.dip2px(this, 180);
+            int menuItemSize = DensityUtil.dip2px(this, 40);
+            FloatMenuCfg menuCfg = new FloatMenuCfg(menuSize, menuItemSize);
+            //3 生成floatballManager
+            mFloatballManager = new FloatBallManager(this, ballCfg, menuCfg);
+            addFloatMenuItem();
+        } else {
+            mFloatballManager = new FloatBallManager(this, ballCfg);
+        }
     }
 
     private void init(boolean showMenu) {
@@ -54,7 +117,7 @@ public class MainActivity extends Activity {
 //        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.LEFT_CENTER,false);
 //        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.LEFT_BOTTOM, -100);
 //        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_TOP, 100);
-        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.LEFT_CENTER);
+        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_BOTTOM);
         //设置悬浮球不半隐藏
 //        ballCfg.setHideHalfLater(false);
         if (showMenu) {
@@ -184,5 +247,4 @@ public class MainActivity extends Activity {
         //注册ActivityLifeCyclelistener以后要记得注销，以防内存泄漏。
         getApplication().unregisterActivityLifecycleCallbacks(mActivityLifeCycleListener);
     }
-
 }

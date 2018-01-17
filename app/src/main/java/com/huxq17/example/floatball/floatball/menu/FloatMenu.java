@@ -16,6 +16,7 @@
 
 package com.huxq17.example.floatball.floatball.menu;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.view.Gravity;
@@ -56,6 +57,14 @@ public class FloatMenu extends FrameLayout {
         mSize = mConfig.mSize;
         init(context);
         mMenuLayout.setChildSize(mItemSize);
+    }
+
+    private void initLayoutParams(Context context) {
+        Activity activity = null;
+        if (context instanceof Activity) {
+            activity = (Activity) context;
+        }
+        mLayoutParams = FloatBallUtil.getLayoutParams(activity, mListenBackEvent);
     }
 
     @SuppressWarnings("deprecation")
@@ -128,7 +137,7 @@ public class FloatMenu extends FrameLayout {
     }
 
     private void init(Context context) {
-        mLayoutParams = FloatBallUtil.getLayoutParams(mListenBackEvent);
+        initLayoutParams(context);
         mLayoutParams.height = mSize;
         mLayoutParams.width = mSize;
         addMenuLayout(context);

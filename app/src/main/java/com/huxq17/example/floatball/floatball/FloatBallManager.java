@@ -10,6 +10,7 @@ import android.view.WindowManager;
 
 import com.huxq17.example.floatball.floatball.floatball.FloatBall;
 import com.huxq17.example.floatball.floatball.floatball.FloatBallCfg;
+import com.huxq17.example.floatball.floatball.floatball.StatusBarView;
 import com.huxq17.example.floatball.floatball.menu.FloatMenu;
 import com.huxq17.example.floatball.floatball.menu.FloatMenuCfg;
 import com.huxq17.example.floatball.floatball.menu.MenuItem;
@@ -20,7 +21,6 @@ import java.util.List;
 
 public class FloatBallManager {
     public int mScreenWidth, mScreenHeight;
-    private int mStatusBarHeight;
 
     private IFloatBallPermission mPermission;
     private OnFloatBallClickListener mFloatballClickListener;
@@ -28,9 +28,11 @@ public class FloatBallManager {
     private Context mContext;
     private FloatBall floatBall;
     private FloatMenu floatMenu;
+    private StatusBarView statusBarView;
     public int floatballX, floatballY;
     private boolean isShowing = false;
     private List<MenuItem> menuItems = new ArrayList<>();
+    private Activity mActivity;
 
     public FloatBallManager(Context application, FloatBallCfg ballCfg) {
         this(application, ballCfg, null);
@@ -38,14 +40,26 @@ public class FloatBallManager {
 
     public FloatBallManager(Context application, FloatBallCfg ballCfg, FloatMenuCfg menuCfg) {
         mContext = application.getApplicationContext();
-        int statusbarId = application.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (statusbarId > 0) {
-            mStatusBarHeight = application.getResources().getDimensionPixelSize(statusbarId);
-        }
+        FloatBallUtil.inSingleActivity = false;
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         computeScreenSize();
         floatBall = new FloatBall(mContext, this, ballCfg);
         floatMenu = new FloatMenu(mContext, this, menuCfg);
+        statusBarView = new StatusBarView(mContext, this);
+    }
+
+    public FloatBallManager(Activity activity, FloatBallCfg ballCfg) {
+        this(activity, ballCfg, null);
+    }
+
+    public FloatBallManager(Activity activity, FloatBallCfg ballCfg, FloatMenuCfg menuCfg) {
+        mActivity = activity;
+        FloatBallUtil.inSingleActivity = true;
+        mWindowManager = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
+        computeScreenSize();
+        floatBall = new FloatBall(mActivity, this, ballCfg);
+        floatMenu = new FloatMenu(mActivity, this, menuCfg);
+        statusBarView = new StatusBarView(mActivity, this);
     }
 
     public void buildMenu() {
@@ -97,20 +111,30 @@ public class FloatBallManager {
             mScreenWidth = mWindowManager.getDefaultDisplay().getWidth();
             mScreenHeight = mWindowManager.getDefaultDisplay().getHeight();
         }
-        mScreenHeight -= mStatusBarHeight;
+    }
+
+    public int getStatusBarHeight() {
+        return statusBarView.getStatusBarHeight();
+    }
+
+    public void onStatusBarHeightChange() {
+        floatBall.onLayoutChange();
     }
 
     public void show() {
-        if (mPermission == null) {
-            return;
-        }
-        if (!mPermission.hasFloatBallPermission(mContext)) {
-            mPermission.onRequestFloatBallPermission();
-            return;
+        if (mActivity == null) {
+            if (mPermission == null) {
+                return;
+            }
+            if (!mPermission.hasFloatBallPermission(mContext)) {
+                mPermission.onRequestFloatBallPermission();
+                return;
+            }
         }
         if (isShowing) return;
         isShowing = true;
         floatBall.setVisibility(View.VISIBLE);
+        statusBarView.attachToWindow(mWindowManager);
         floatBall.attachToWindow(mWindowManager);
         floatMenu.detachFromWindow(mWindowManager);
     }
@@ -140,6 +164,7 @@ public class FloatBallManager {
         isShowing = false;
         floatBall.detachFromWindow(mWindowManager);
         floatMenu.detachFromWindow(mWindowManager);
+        statusBarView.detachFromWindow(mWindowManager);
     }
 
     public void onConfigurationChanged(Configuration newConfig) {
