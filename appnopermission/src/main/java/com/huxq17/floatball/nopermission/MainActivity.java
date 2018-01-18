@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
         //1 初始化悬浮球配置，定义好悬浮球大小和icon的drawable
         int ballSize = DensityUtil.dip2px(this, 45);
         Drawable ballIcon = BackGroudSeletor.getdrawble("ic_floatball", this);
-        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_BOTTOM);
+        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_CENTER);
         //设置悬浮球不半隐藏
 //        ballCfg.setHideHalfLater(false);
         if (showMenu) {
