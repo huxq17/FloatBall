@@ -172,6 +172,9 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
 ```
 ### 更新日志：<br/>
 
+    2018-1-18：
+    1.添加悬浮球仅在单Activity里显示时不需要权限,详见appnopermission模块。
+
     2018-1-16：
     1.添加对是否半隐藏悬浮球的设置。
 
