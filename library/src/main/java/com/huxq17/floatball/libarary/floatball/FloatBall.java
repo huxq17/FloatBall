@@ -123,9 +123,13 @@ public class FloatBall extends FrameLayout implements ICarrier {
             mLayoutChanged = false;
         }
         if (height != 0 && isFirst || mLayoutChanged) {
+            if (isFirst&&height != 0) {
+                location(width, height);
+            } else {
+                moveToEdge(false, sleep);
+            }
             isFirst = false;
             mLayoutChanged = false;
-            location(width, height);
         }
     }
 

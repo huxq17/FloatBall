@@ -19,8 +19,8 @@ public class MainActivity extends Activity {
     private FloatBallManager mFloatballManager;
 
     public void showFloatBall(View v) {
-        mFloatballManager.show();
-//        setFullScreen(v);
+//        mFloatballManager.show();
+        setFullScreen(v);
     }
 
     @Override
