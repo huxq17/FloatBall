@@ -197,6 +197,10 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
 
 1. [悬浮球权限适配相关的库](https://github.com/zhaozepeng/FloatWindowPermission)
 
+### LICENSE
+
+[Apache License 2.0](LICENSE)
+
 
 
 
