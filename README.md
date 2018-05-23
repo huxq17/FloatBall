@@ -171,6 +171,8 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
   mFloatballManager.hide();
 ```
 ### 更新日志：<br/>
+    2018-5-23：
+    1.解决在小米miui9上悬浮球不显示的问题。
 
     2018-1-18：
     1.添加悬浮球仅在单Activity里显示时不需要权限,详见appnopermission模块。

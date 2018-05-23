@@ -28,7 +28,11 @@ public class FloatBallUtil {
             if (sdkInt < Build.VERSION_CODES.KITKAT) {
                 layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
             } else if (sdkInt < Build.VERSION_CODES.N_MR1) {
-                layoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+                if ("Xiaomi".equalsIgnoreCase(Build.MANUFACTURER)) {
+                    layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+                } else {
+                    layoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+                }
             } else if (sdkInt < Build.VERSION_CODES.O) {
                 layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
             } else {//8.0以后

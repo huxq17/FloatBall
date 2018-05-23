@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
         super.onUserLeaveHint();
     }
 
-    private void quitFullScreen() {
+    private void exitFullScreen() {
         final WindowManager.LayoutParams attrs = getWindow().getAttributes();
         attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setAttributes(attrs);
@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 
     public void setFullScreen(View view) {
         if (isfull == true) {
-            quitFullScreen();
+            exitFullScreen();
         } else {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             isfull = true;
