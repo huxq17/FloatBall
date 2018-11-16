@@ -24,6 +24,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.buyi.huxq17:serviceagency:1.1.0'
 }

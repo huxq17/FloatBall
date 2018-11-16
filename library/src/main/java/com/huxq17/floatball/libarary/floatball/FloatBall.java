@@ -12,8 +12,11 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.buyi.huxq17.serviceagency.ServiceAgency;
+import com.buyi.huxq17.serviceagency.exception.AgencyException;
 import com.huxq17.floatball.libarary.FloatBallManager;
 import com.huxq17.floatball.libarary.FloatBallUtil;
+import com.huxq17.floatball.libarary.LocationService;
 import com.huxq17.floatball.libarary.runner.ICarrier;
 import com.huxq17.floatball.libarary.runner.OnceRunnable;
 import com.huxq17.floatball.libarary.runner.ScrollRunner;
@@ -44,6 +47,7 @@ public class FloatBall extends FrameLayout implements ICarrier {
     private boolean mHideHalfLater = true;
     private boolean mLayoutChanged = false;
     private int mSleepX = -1;
+    private boolean isLocationServiceEnable;
     private OnceRunnable mSleepRunnable = new OnceRunnable() {
         @Override
         public void onRun() {
@@ -59,6 +63,12 @@ public class FloatBall extends FrameLayout implements ICarrier {
         super(context);
         this.floatBallManager = floatBallManager;
         mConfig = config;
+        try {
+            ServiceAgency.getService(LocationService.class);
+            isLocationServiceEnable = true;
+        } catch (AgencyException e) {
+            isLocationServiceEnable = false;
+        }
         init(context);
     }
 
@@ -123,7 +133,7 @@ public class FloatBall extends FrameLayout implements ICarrier {
             mLayoutChanged = false;
         }
         if (height != 0 && isFirst || mLayoutChanged) {
-            if (isFirst&&height != 0) {
+            if (isFirst && height != 0) {
                 location(width, height);
             } else {
                 moveToEdge(false, sleep);
@@ -158,6 +168,18 @@ public class FloatBall extends FrameLayout implements ICarrier {
         if (y < 0) y = topLimit;
         if (y > bottomLimit)
             y = topLimit;
+        if (isLocationServiceEnable) {
+            LocationService locationService = ServiceAgency.getService(LocationService.class);
+            int[] location = locationService.onRestoreLocation();
+            if (location.length == 2) {
+                int locationX = location[0];
+                int locationY = location[1];
+                if (locationX != -1 && locationY != -1) {
+                    onLocation(locationX, locationY);
+                    return;
+                }
+            }
+        }
         onLocation(x, y);
     }
 
@@ -277,10 +299,10 @@ public class FloatBall extends FrameLayout implements ICarrier {
         int destX;
         final int minVelocity = mVelocity.getMinVelocity();
         if (mLayoutParams.x < centerX) {
-            sleep = forceSleep ? true : Math.abs(mVelocityX) > minVelocity && mVelocityX < 0 || mLayoutParams.x < 0;
+            sleep = forceSleep || Math.abs(mVelocityX) > minVelocity && mVelocityX < 0 || mLayoutParams.x < 0;
             destX = sleep ? -halfWidth : 0;
         } else {
-            sleep = forceSleep ? true : Math.abs(mVelocityX) > minVelocity && mVelocityX > 0 || mLayoutParams.x > screenWidth - width;
+            sleep = forceSleep || Math.abs(mVelocityX) > minVelocity && mVelocityX > 0 || mLayoutParams.x > screenWidth - width;
             destX = sleep ? screenWidth - halfWidth : screenWidth - width;
         }
         if (sleep) {
@@ -316,6 +338,10 @@ public class FloatBall extends FrameLayout implements ICarrier {
     @Override
     public void onDone() {
         postSleepRunnable();
+        if (isLocationServiceEnable) {
+            LocationService locationService = ServiceAgency.getService(LocationService.class);
+            locationService.onLocationChanged(mLayoutParams.x, mLayoutParams.y);
+        }
     }
 
     private void moveTo(int x, int y) {

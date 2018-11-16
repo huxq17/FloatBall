@@ -5,6 +5,25 @@
  <img src="gifs/gif1.gif" width="280" height="475" />|<img src="gifs/gif2.gif" width="280" height="475" />
 
 
+### Gradle
+项目根目录的build.gradle：
+```
+buildscript {
+   allprojects {
+       repositories {
+           jcenter()
+       }
+   }
+    dependencies {
+        classpath 'com.buyi.huxq17:agencyplugin:1.1.0'
+    }
+}
+```
+App模块的build.gradle：
+
+```
+apply plugin: 'service_agency'
+```
 
 ### 初始化悬浮球配置
 
@@ -110,6 +129,54 @@ private void setFloatPermission() {
 
     });
 ```
+### 记录悬浮球位置并恢复
+如果想记录悬浮球位置并在下次打开的时候在上次的位置显示，可参照以下的步骤：
+1. 实现LocationService，这里用的SharedPreferences记录位置,你也可以用其他的方式，在类上添加ServiceAgent注解，floatball在需要的时候会找到这个实现类并进行位置记录和恢复的操作。
+
+```
+@ServiceAgent
+public class SimpleLocationService implements LocationService {
+    private SharedPreferences sharedPreferences;
+
+    @Override
+    public void onLocationChanged(int x, int y) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("floatball_x", x);
+        editor.putInt("floatball_y", y);
+        editor.apply();
+    }
+
+    @Override
+    public int[] onRestoreLocation() {
+        //如果坐标点传的是-1，那么就不会恢复位置。
+        int[] location = {sharedPreferences.getInt("floatball_x", -1),
+                sharedPreferences.getInt("floatball_y", -1)};
+        return location;
+    }
+
+    @Override
+    public void start(Context context) {
+        sharedPreferences = context.getSharedPreferences("floatball_location", Context.MODE_PRIVATE);
+    }
+}
+```
+
+2. 启动LocationService，如果你的实现需要Context的话，可选的。
+```
+public class App extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        //在LocationService的实现类里用的是SharedPreferences来记录位置，需要context
+        //如果你的实现方式不需要context，则可以不需要这个步骤，可以去掉这行代码
+        ServiceAgency.getService(LocationService.class).start(this);
+    }
+}
+```
+这里用到了ServiceAgency，如果感兴趣可以[点击查看更多](https://github.com/huxq17/ServiceAgency)。
+
+
+
 ### 实现应用内悬浮球
 如果想让悬浮球只在应用内打开，可以参考以下代码实现：
 
@@ -171,6 +238,9 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
   mFloatballManager.hide();
 ```
 ### 更新日志：<br/>
+    2018-11-16：
+    1.添加悬浮球位置记录和恢复功能。详见 https://github.com/huxq17/FloatBall/issues/16
+
     2018-5-23：
     1.解决在小米miui9上悬浮球不显示的问题。
 
@@ -202,7 +272,3 @@ private ActivityLifeCycleListener mActivityLifeCycleListener = new ActivityLifeC
 ### LICENSE
 
 [Apache License 2.0](LICENSE)
-
-
-
-
