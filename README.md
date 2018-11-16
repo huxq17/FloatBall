@@ -15,7 +15,7 @@ buildscript {
        }
    }
     dependencies {
-        classpath 'com.buyi.huxq17:agencyplugin:1.1.0'
+        classpath 'com.buyi.huxq17:agencyplugin:1.1.2'
     }
 }
 ```
@@ -169,7 +169,11 @@ public class App extends Application {
         super.onCreate();
         //在LocationService的实现类里用的是SharedPreferences来记录位置，需要context
         //如果你的实现方式不需要context，则可以不需要这个步骤，可以去掉这行代码
-        ServiceAgency.getService(LocationService.class).start(this);
+         try {
+             ServiceAgency.getService(LocationService.class).start(this);
+         }catch (AgencyException e){
+            //ignore
+         }
     }
 }
 ```
