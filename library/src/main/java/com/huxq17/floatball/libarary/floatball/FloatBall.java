@@ -143,6 +143,13 @@ public class FloatBall extends FrameLayout implements ICarrier {
         }
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        floatBallManager.floatballX = mLayoutParams.x;
+        floatBallManager.floatballY = mLayoutParams.y;
+    }
+
     private void location(int width, int height) {
         FloatBallCfg.Gravity cfgGravity = mConfig.mGravity;
         mHideHalfLater = mConfig.mHideHalfLater;

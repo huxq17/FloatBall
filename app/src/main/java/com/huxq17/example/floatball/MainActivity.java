@@ -52,6 +52,7 @@ public class MainActivity extends Activity {
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         mFloatballManager.show();
+        mFloatballManager.onFloatBallClick();
     }
 
     @Override
@@ -97,7 +98,7 @@ public class MainActivity extends Activity {
 //        FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_TOP, 100);
         FloatBallCfg ballCfg = new FloatBallCfg(ballSize, ballIcon, FloatBallCfg.Gravity.RIGHT_CENTER);
         //设置悬浮球不半隐藏
-//        ballCfg.setHideHalfLater(false);
+        ballCfg.setHideHalfLater(false);
         if (showMenu) {
             //2 需要显示悬浮菜单
             //2.1 初始化悬浮菜单配置，有菜单item的大小和菜单item的个数
@@ -107,6 +108,7 @@ public class MainActivity extends Activity {
             //3 生成floatballManager
             mFloatballManager = new FloatBallManager(getApplicationContext(), ballCfg, menuCfg);
             addFloatMenuItem();
+
         } else {
             mFloatballManager = new FloatBallManager(getApplicationContext(), ballCfg);
         }
